@@ -1,9 +1,19 @@
 import 'package:app/page/initial/page.dart';
 import 'package:app/util/background.dart';
+import 'package:app/util/titlebar.dart';
 import 'package:flutter/material.dart';
+import 'package:bitsdojo_window/bitsdojo_window.dart';
 
 void main() {
   runApp(const Sonar());
+
+  doWhenWindowReady(() {
+    const initialSize = Size(1280, 720);
+    appWindow.minSize = initialSize;
+    appWindow.size = initialSize;
+    appWindow.alignment = Alignment.center;
+    appWindow.show();
+  });
 }
 
 class Sonar extends StatelessWidget {
@@ -13,12 +23,15 @@ class Sonar extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Sonar',
-      theme: ThemeData(splashFactory: NoSplash.splashFactory),
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        splashFactory: NoSplash.splashFactory,
+      ),
       builder: (context, child) => Material(
         child: Stack(
           children: child == null
-              ? [const Background()]
-              : [const Background(), child],
+              ? [const Background(), const TitleBar()]
+              : [const Background(), child, const TitleBar()],
         ),
       ),
       initialRoute: '/',

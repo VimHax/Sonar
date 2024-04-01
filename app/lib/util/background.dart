@@ -1,3 +1,4 @@
+import 'package:app/util/colors.dart';
 import 'package:flutter/material.dart';
 
 class Background extends StatelessWidget {
@@ -5,6 +6,7 @@ class Background extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return Container(color: BrandColors.black);
     return Container(
         decoration: const BoxDecoration(
             image: DecorationImage(

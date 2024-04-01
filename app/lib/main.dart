@@ -1,6 +1,9 @@
 import 'package:app/page/initial/page.dart';
+import 'package:app/page/login/page.dart';
 import 'package:app/util/background.dart';
+import 'package:app/util/colors.dart';
 import 'package:app/util/titlebar.dart';
+import 'package:app/util/transition.dart';
 import 'package:flutter/material.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 
@@ -25,8 +28,23 @@ class Sonar extends StatelessWidget {
       title: 'Sonar',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        splashFactory: NoSplash.splashFactory,
-      ),
+          // splashFactory: NoSplash.splashFactory,
+          textButtonTheme: TextButtonThemeData(
+            style: ButtonStyle(
+                shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(0),
+                )),
+                padding: MaterialStateProperty.all(const EdgeInsets.all(25)),
+                side: MaterialStateProperty.all(
+                    BorderSide(color: BrandColors.white.withAlpha(50))),
+                backgroundColor:
+                    MaterialStateProperty.all(BrandColors.black.withAlpha(50))),
+          ),
+          colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.grey),
+          pageTransitionsTheme: PageTransitionsTheme(builders: {
+            for (var element in TargetPlatform.values)
+              element: const CustomTransitionBuilder()
+          })),
       builder: (context, child) => Material(
         child: Stack(
           children: child == null
@@ -35,7 +53,11 @@ class Sonar extends StatelessWidget {
         ),
       ),
       initialRoute: '/',
-      routes: {'/': (context) => const InitialPage()},
+      routes: {
+        '/': (context) => const InitialPage(),
+        '/login': (context) => const LoginPage()
+      },
+      // home: Background(),
     );
   }
 }

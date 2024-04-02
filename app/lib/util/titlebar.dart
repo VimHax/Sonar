@@ -19,8 +19,6 @@ class WindowButton extends StatelessWidget {
         onPressed: onPressed,
         style: ButtonStyle(
             backgroundColor: MaterialStateProperty.all(Colors.transparent),
-            overlayColor:
-                MaterialStateProperty.all(BrandColors.white.withAlpha(25)),
             minimumSize: MaterialStateProperty.all(const Size(30, 30)),
             padding: MaterialStateProperty.all(const EdgeInsets.all(0)),
             side: MaterialStateProperty.all(BorderSide.none)),

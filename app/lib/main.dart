@@ -1,13 +1,59 @@
+import 'dart:io';
+
 import 'package:app/page/initial/page.dart';
 import 'package:app/page/login/page.dart';
+import 'package:app/page/main/page.dart';
 import 'package:app/util/background.dart';
 import 'package:app/util/colors.dart';
 import 'package:app/util/titlebar.dart';
 import 'package:app/util/transition.dart';
 import 'package:flutter/material.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:win32_registry/win32_registry.dart';
 
-void main() {
+final supabase = Supabase.instance.client;
+
+Future<void> registerSchemeWindows(String scheme) async {
+  String appPath = Platform.resolvedExecutable;
+
+  String protocolRegKey = 'Software\\Classes\\$scheme';
+  RegistryValue protocolRegValue = const RegistryValue(
+    'URL Protocol',
+    RegistryValueType.string,
+    '',
+  );
+  String protocolCmdRegKey = 'shell\\open\\command';
+  RegistryValue protocolCmdRegValue = RegistryValue(
+    '',
+    RegistryValueType.string,
+    '"$appPath" "%1"',
+  );
+
+  final regKey = Registry.currentUser.createKey(protocolRegKey);
+  regKey.createValue(protocolRegValue);
+  regKey.createKey(protocolCmdRegKey).createValue(protocolCmdRegValue);
+}
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Supabase.initialize(
+    url: const String.fromEnvironment("SUPABASE_URL"),
+    anonKey: const String.fromEnvironment("SUPABASE_ANON_KEY"),
+  );
+
+  supabase.auth.onAuthStateChange.listen((data) {
+    final AuthChangeEvent event = data.event;
+    final Session? session = data.session;
+    if (event == AuthChangeEvent.signedIn) {
+      // handle signIn event
+    }
+    if (session != null) {
+      stdout.writeln(session.user.identities!.elementAt(0).id);
+    }
+  });
+
   runApp(const Sonar());
 
   doWhenWindowReady(() {
@@ -31,22 +77,27 @@ class Sonar extends StatelessWidget {
           // splashFactory: NoSplash.splashFactory,
           textButtonTheme: TextButtonThemeData(
             style: ButtonStyle(
+                overlayColor:
+                    MaterialStateProperty.all(BrandColors.white.withAlpha(25)),
                 shape: MaterialStateProperty.all(RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(0),
                 )),
                 padding: MaterialStateProperty.all(const EdgeInsets.all(25)),
                 side: MaterialStateProperty.all(
                     BorderSide(color: BrandColors.white.withAlpha(50))),
-                backgroundColor:
-                    MaterialStateProperty.all(BrandColors.black.withAlpha(50))),
+                foregroundColor: MaterialStateProperty.resolveWith((states) {
+                  return BrandColors.white.withAlpha(
+                      states.contains(MaterialState.disabled) ? 50 : 255);
+                })),
           ),
-          colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.grey),
+          colorScheme: ColorScheme.fromSwatch(
+              primarySwatch: Colors.grey, brightness: Brightness.dark),
           pageTransitionsTheme: PageTransitionsTheme(builders: {
             for (var element in TargetPlatform.values)
               element: const CustomTransitionBuilder()
           })),
-      builder: (context, child) => Material(
-        child: Stack(
+      builder: (context, child) => Scaffold(
+        body: Stack(
           children: child == null
               ? [const Background(), const TitleBar()]
               : [const Background(), child, const TitleBar()],
@@ -55,7 +106,8 @@ class Sonar extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => const InitialPage(),
-        '/login': (context) => const LoginPage()
+        '/login': (context) => const LoginPage(),
+        '/main': (context) => const MainPage()
       },
       // home: Background(),
     );

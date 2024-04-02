@@ -35,6 +35,8 @@ dependencies:
     bitsdojo_window: ^0.1.6
     flutter_svg: ^2.0.10+1
     animate_do: ^3.3.4
+    supabase_flutter: ^2.3.4
+    win32_registry: ^1.1.2
 
 dev_dependencies:
     flutter_test:

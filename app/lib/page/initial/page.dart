@@ -14,7 +14,8 @@ class InitialPage extends StatelessWidget {
       children: [
         Container(
           color: Colors.transparent,
-          alignment: Alignment.center,
+        ),
+        Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -64,7 +65,6 @@ class InitialPage extends StatelessWidget {
                       child: Text("Continue".toUpperCase(),
                           style: GoogleFonts.montserrat(
                               textStyle: const TextStyle(
-                                  color: BrandColors.white,
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
                                   letterSpacing: 2)))),

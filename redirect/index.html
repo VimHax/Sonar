@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Sonar</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap"
+            rel="stylesheet"
+        />
+        <style>
+            .bebas-neue-regular {
+                font-family: "Bebas Neue", sans-serif;
+                font-weight: 400;
+                font-style: normal;
+            }
+
+            body {
+                height: 100vh;
+                width: 100vw;
+                overflow: hidden;
+                font-family: sans-serif;
+                color: white;
+                background-color: black;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+            }
+
+            h1 {
+                font-size: 150px;
+                text-transform: uppercase;
+                letter-spacing: 10px;
+            }
+
+            button {
+                transition: background-color 0.1s ease-in-out;
+                border: solid #ffffff32 1px;
+                background-color: black;
+                color: white;
+                padding: 27px 30px 27px 30px;
+                font-size: 16px;
+                font-weight: bold;
+                text-transform: uppercase;
+                letter-spacing: 3px;
+            }
+
+            button:hover {
+                background-color: #ffffff19;
+                cursor: pointer;
+            }
+
+            #title-container {
+                position: absolute;
+                left: 0;
+                top: 50px;
+                width: 100vw;
+                display: flex;
+                justify-content: center;
+            }
+
+            #title {
+                font-weight: bold;
+                text-transform: uppercase;
+                letter-spacing: 3px;
+            }
+
+            #notice-container {
+                transition: opacity 0.3s ease-in-out;
+                opacity: 0;
+                position: absolute;
+                left: 0;
+                bottom: 50px;
+                width: 100vw;
+                display: flex;
+                justify-content: center;
+            }
+
+            #notice {
+                font-weight: normal;
+                color: #ffffff64;
+            }
+        </style>
+        <script>
+            function openApp() {
+                const urlParams = new URLSearchParams(window.location.search);
+                window.location = `com.vimhax.sonar://login-callback?code=${urlParams.get(
+                    "code"
+                )}`;
+                document.getElementById("notice-container").style.opacity = "1";
+            }
+        </script>
+    </head>
+    <body>
+        <div id="title-container">
+            <span id="title">Sonar</span>
+        </div>
+        <div>
+            <h1 class="bebas-neue-regular">Authorized</h1>
+            <button onclick="openApp()">Open Desktop App</button>
+        </div>
+        <div id="notice-container">
+            <span id="notice">You may now close this tab.</span>
+        </div>
+    </body>
+</html>

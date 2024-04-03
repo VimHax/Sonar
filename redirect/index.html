@@ -38,7 +38,7 @@
 
             button {
                 transition: background-color 0.1s ease-in-out;
-                border: solid #ffffff32 1px;
+                border: solid #ffffff19 1px;
                 background-color: black;
                 color: white;
                 padding: 27px 30px 27px 30px;
@@ -70,7 +70,6 @@
 
             #notice-container {
                 transition: opacity 0.3s ease-in-out;
-                opacity: 0;
                 position: absolute;
                 left: 0;
                 bottom: 50px;
@@ -85,12 +84,18 @@
             }
         </style>
         <script>
+            const urlParams = new URLSearchParams(window.location.search);
+
+            const url = `com.vimhax.sonar://login-callback?code=${urlParams.get(
+                "code"
+            )}`;
+
+            document.addEventListener("DOMContentLoaded", () => {
+                window.location = url;
+            });
+
             function openApp() {
-                const urlParams = new URLSearchParams(window.location.search);
-                window.location = `com.vimhax.sonar://login-callback?code=${urlParams.get(
-                    "code"
-                )}`;
-                document.getElementById("notice-container").style.opacity = "1";
+                window.location = url;
             }
         </script>
     </head>

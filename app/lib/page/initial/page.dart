@@ -1,8 +1,5 @@
-import 'dart:ui';
-
 import 'package:animate_do/animate_do.dart';
 import 'package:app/main.dart';
-import 'package:app/util/blur.dart';
 import 'package:app/util/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -12,23 +9,24 @@ class InitialPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return Container(
+      color: Colors.transparent,
       padding:
           const EdgeInsets.fromLTRB(borderWidth, 0, borderWidth, borderWidth),
-      child: Blur(
+      child: FadeIn(
         child: Container(
           decoration: const BoxDecoration(
-              color: BrandColors.black,
+              color: BrandColors.grey,
               borderRadius: BorderRadius.all(Radius.circular(10))),
           child: Stack(
             children: [
               Center(
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     FadeInDown(
-                        duration: Durations.medium1,
-                        delay: Durations.medium1,
+                        duration: const Duration(milliseconds: 300),
+                        delay: const Duration(milliseconds: 200),
                         child: Text("Sonar".toUpperCase(),
                             style: GoogleFonts.bebasNeue(
                               textStyle: const TextStyle(
@@ -41,7 +39,7 @@ class InitialPage extends StatelessWidget {
                       height: 25,
                     ),
                     FadeIn(
-                      delay: Durations.long1,
+                      delay: const Duration(milliseconds: 400),
                       child: Text("By VimHax".toUpperCase(),
                           style: GoogleFonts.montserrat(
                             textStyle: const TextStyle(
@@ -59,7 +57,7 @@ class InitialPage extends StatelessWidget {
                 alignment: Alignment.bottomCenter,
                 padding: const EdgeInsets.only(bottom: 50),
                 child: FadeIn(
-                  delay: Durations.long4,
+                  delay: const Duration(milliseconds: 600),
                   child: TextButton(
                       onPressed: () {
                         Navigator.pushReplacementNamed(context, "/login");

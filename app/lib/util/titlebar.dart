@@ -1,7 +1,6 @@
 import 'dart:ui';
 
 import 'package:app/main.dart';
-import 'package:app/util/blur.dart';
 import 'package:app/util/colors.dart';
 import 'package:app/util/hover_button.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
@@ -20,7 +19,9 @@ class WindowButton extends StatelessWidget {
     return HoverButton(
         onPressed: onPressed,
         style: ButtonStyle(
-            // overlayColor: MaterialStateProperty.all(BrandColors.blackA),
+            shape: MaterialStateProperty.all(RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(0),
+            )),
             backgroundColor: MaterialStateProperty.all(Colors.transparent),
             minimumSize: MaterialStateProperty.all(const Size(30, 30)),
             padding: MaterialStateProperty.all(const EdgeInsets.all(0)),
@@ -48,78 +49,76 @@ class TitleBar extends StatelessWidget {
             borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(borderRadius),
                 topRight: Radius.circular(borderRadius))),
-        child: Stack(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Padding(
               padding: const EdgeInsets.all(borderWidth),
-              child: Blur(
+              child: Container(
+                constraints: const BoxConstraints.expand(width: 75),
+                decoration: const BoxDecoration(
+                    color: BrandColors.grey,
+                    borderRadius:
+                        BorderRadius.all(Radius.circular(borderRadius))),
+                alignment: Alignment.center,
+                child: Text("SONAR",
+                    style: GoogleFonts.montserrat(
+                        textStyle: const TextStyle(
+                            color: BrandColors.white,
+                            fontSize: 10,
+                            letterSpacing: 3,
+                            fontWeight: FontWeight.w600))),
+              ),
+            ),
+            Expanded(child: MoveWindow()),
+            Padding(
+              padding: const EdgeInsets.all(borderWidth),
+              child: ClipRRect(
+                borderRadius:
+                    const BorderRadius.all(Radius.circular(borderRadius)),
                 child: Container(
-                  constraints: const BoxConstraints.expand(width: 75),
                   decoration: const BoxDecoration(
-                      color: BrandColors.black,
+                      color: BrandColors.grey,
                       borderRadius:
                           BorderRadius.all(Radius.circular(borderRadius))),
-                  alignment: Alignment.center,
-                  child: Text("SONAR",
-                      style: GoogleFonts.montserrat(
-                          textStyle: const TextStyle(
-                              color: BrandColors.white,
-                              fontSize: 10,
-                              letterSpacing: 3,
-                              fontWeight: FontWeight.w600))),
+                  child: Row(
+                    children: [
+                      WindowButton(
+                        icon: SvgPicture.asset(
+                          "images/titlebar/minimize.svg",
+                          colorFilter: const ColorFilter.mode(
+                              BrandColors.white, BlendMode.srcIn),
+                          width: 17,
+                          height: 17,
+                        ),
+                        onPressed: () => appWindow.minimize(),
+                      ),
+                      WindowButton(
+                        icon: SvgPicture.asset(
+                          "images/titlebar/maximize.svg",
+                          colorFilter: const ColorFilter.mode(
+                              BrandColors.white, BlendMode.srcIn),
+                          width: 17,
+                          height: 17,
+                        ),
+                        onPressed: () => appWindow.maximizeOrRestore(),
+                      ),
+                      WindowButton(
+                        icon: SvgPicture.asset(
+                          "images/titlebar/close.svg",
+                          colorFilter: const ColorFilter.mode(
+                              BrandColors.white, BlendMode.srcIn),
+                          width: 17,
+                          height: 17,
+                        ),
+                        onPressed: () => appWindow.close(),
+                      )
+                    ],
+                  ),
                 ),
               ),
             ),
-            Row(
-              children: [
-                Expanded(child: MoveWindow()),
-                Padding(
-                  padding: const EdgeInsets.all(borderWidth),
-                  child: Blur(
-                    child: Container(
-                      decoration: const BoxDecoration(
-                          color: BrandColors.black,
-                          borderRadius:
-                              BorderRadius.all(Radius.circular(borderRadius))),
-                      child: Row(
-                        children: [
-                          WindowButton(
-                            icon: SvgPicture.asset(
-                              "images/titlebar/minimize.svg",
-                              colorFilter: const ColorFilter.mode(
-                                  BrandColors.white, BlendMode.srcIn),
-                              width: 17,
-                              height: 17,
-                            ),
-                            onPressed: () => appWindow.minimize(),
-                          ),
-                          WindowButton(
-                            icon: SvgPicture.asset(
-                              "images/titlebar/maximize.svg",
-                              colorFilter: const ColorFilter.mode(
-                                  BrandColors.white, BlendMode.srcIn),
-                              width: 17,
-                              height: 17,
-                            ),
-                            onPressed: () => appWindow.maximizeOrRestore(),
-                          ),
-                          WindowButton(
-                            icon: SvgPicture.asset(
-                              "images/titlebar/close.svg",
-                              colorFilter: const ColorFilter.mode(
-                                  BrandColors.white, BlendMode.srcIn),
-                              width: 17,
-                              height: 17,
-                            ),
-                            onPressed: () => appWindow.close(),
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            )
           ],
         ));
   }

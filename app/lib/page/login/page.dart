@@ -1,5 +1,5 @@
+import 'dart:async';
 import 'dart:io';
-import 'dart:ui';
 
 import 'package:animate_do/animate_do.dart';
 import 'package:app/main.dart';
@@ -17,10 +17,11 @@ class LoginPage extends StatefulWidget {
 
 class LoginPageState extends State<LoginPage> {
   bool _loading = false;
+  StreamSubscription<AuthState>? _sub;
 
   @override
   void initState() {
-    supabase.auth.onAuthStateChange.listen((data) {
+    _sub = supabase.auth.onAuthStateChange.listen((data) {
       if (data.session != null) {
         Navigator.pushReplacementNamed(context, "/main");
       }
@@ -29,72 +30,88 @@ class LoginPageState extends State<LoginPage> {
   }
 
   @override
+  void dispose() {
+    _sub?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Container(
-          color: Colors.transparent,
-        ),
-        Center(
-          child: FadeInDown(
-            duration: Durations.medium1,
-            delay: Durations.medium1,
-            child: Text("Login".toUpperCase(),
-                style: GoogleFonts.bebasNeue(
-                  textStyle: const TextStyle(
-                      color: BrandColors.white,
-                      fontSize: 195,
-                      height: 0.65,
-                      letterSpacing: 20),
-                )),
+    return Container(
+      color: Colors.transparent,
+      padding:
+          const EdgeInsets.fromLTRB(borderWidth, 0, borderWidth, borderWidth),
+      child: FadeIn(
+        child: Container(
+          decoration: const BoxDecoration(
+              color: BrandColors.grey,
+              borderRadius: BorderRadius.all(Radius.circular(10))),
+          child: Stack(
+            children: [
+              Center(
+                child: FadeInDown(
+                  duration: const Duration(milliseconds: 300),
+                  delay: const Duration(milliseconds: 200),
+                  child: Text("Login".toUpperCase(),
+                      style: GoogleFonts.bebasNeue(
+                        textStyle: const TextStyle(
+                            color: BrandColors.white,
+                            fontSize: 195,
+                            height: 0.65,
+                            letterSpacing: 20),
+                      )),
+                ),
+              ),
+              Container(
+                alignment: Alignment.bottomCenter,
+                padding: EdgeInsets.only(bottom: _loading ? 100 : 50),
+                child: FadeIn(
+                  delay: const Duration(milliseconds: 400),
+                  child: _loading
+                      ? const SizedBox(
+                          width: 40,
+                          height: 40,
+                          child: CircularProgressIndicator(),
+                        )
+                      : TextButton(
+                          onPressed: _loading
+                              ? null
+                              : () async {
+                                  setState(() {
+                                    _loading = true;
+                                  });
+                                  try {
+                                    stdout.writeln("Signing In!");
+                                    await supabase.auth.signInWithOAuth(
+                                        OAuthProvider.discord,
+                                        redirectTo:
+                                            'https://sonar-xi.vercel.app/');
+                                    stdout.writeln("Signed In!");
+                                  } catch (e) {
+                                    setState(() {
+                                      _loading = false;
+                                    });
+                                    if (context.mounted) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(const SnackBar(
+                                        content: Text('Login failed'),
+                                        backgroundColor: BrandColors.red,
+                                      ));
+                                    }
+                                  }
+                                },
+                          child: Text("Login with Discord".toUpperCase(),
+                              style: GoogleFonts.montserrat(
+                                  textStyle: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      letterSpacing: 2)))),
+                ),
+              )
+            ],
           ),
         ),
-        Container(
-          alignment: Alignment.bottomCenter,
-          padding: EdgeInsets.only(bottom: _loading ? 100 : 50),
-          child: FadeIn(
-            delay: Durations.long4,
-            child: _loading
-                ? const SizedBox(
-                    width: 40,
-                    height: 40,
-                    child: CircularProgressIndicator(),
-                  )
-                : TextButton(
-                    onPressed: _loading
-                        ? null
-                        : () async {
-                            setState(() {
-                              _loading = true;
-                            });
-                            try {
-                              stdout.writeln("Signing In!");
-                              await supabase.auth.signInWithOAuth(
-                                  OAuthProvider.discord,
-                                  redirectTo: 'https://sonar-xi.vercel.app/');
-                              stdout.writeln("Signed In!");
-                            } catch (e) {
-                              setState(() {
-                                _loading = false;
-                              });
-                              if (context.mounted) {
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(const SnackBar(
-                                  content: Text('Login failed'),
-                                  backgroundColor: BrandColors.red,
-                                ));
-                              }
-                            }
-                          },
-                    child: Text("Login with Discord".toUpperCase(),
-                        style: GoogleFonts.montserrat(
-                            textStyle: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                letterSpacing: 2)))),
-          ),
-        )
-      ],
+      ),
     );
   }
 }

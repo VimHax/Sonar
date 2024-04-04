@@ -13,6 +13,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:win32_registry/win32_registry.dart';
 
 final supabase = Supabase.instance.client;
+const borderWidth = 10.0;
+const borderRadius = 10.0;
 
 Future<void> registerSchemeWindows(String scheme) async {
   String appPath = Platform.resolvedExecutable;
@@ -79,12 +81,12 @@ class Sonar extends StatelessWidget {
             style: ButtonStyle(
                 overlayColor: MaterialStateProperty.all(BrandColors.whiteA),
                 shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(0),
+                  borderRadius: BorderRadius.circular(borderRadius),
                 )),
                 padding: MaterialStateProperty.all(const EdgeInsets.all(25)),
                 side: MaterialStateProperty.all(
                     const BorderSide(color: BrandColors.whiteA)),
-                backgroundColor: MaterialStateProperty.all(BrandColors.blackA),
+                backgroundColor: MaterialStateProperty.all(BrandColors.whiteAA),
                 foregroundColor: MaterialStateProperty.resolveWith((states) {
                   return states.contains(MaterialState.disabled)
                       ? BrandColors.whiteA
@@ -98,10 +100,16 @@ class Sonar extends StatelessWidget {
               element: const CustomTransitionBuilder()
           })),
       builder: (context, child) => Scaffold(
+        backgroundColor: Colors.transparent,
         body: Stack(
           children: child == null
               ? [const Background(), const TitleBar()]
-              : [const Background(), child, const TitleBar()],
+              : [
+                  const Background(),
+                  Column(
+                    children: [const TitleBar(), Expanded(child: child)],
+                  )
+                ],
         ),
       ),
       initialRoute: '/',

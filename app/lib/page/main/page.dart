@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:animate_do/animate_do.dart';
 import 'package:app/main.dart';
+import 'package:app/page/main/account_dialog.dart';
 import 'package:app/util/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -110,15 +111,34 @@ class _MainPageState extends State<MainPage> {
                           delay: const Duration(milliseconds: 800),
                           child: AspectRatio(
                             aspectRatio: 1,
-                            child: Container(
-                              alignment: Alignment.center,
-                              child: const CircleAvatar(
-                                radius: 20,
-                                backgroundImage: NetworkImage(
-                                  "https://cdn.discordapp.com/avatars/242674430566858753/b6e7d53e222626bd84df16cf8607a3e8.png",
-                                ),
-                              ),
-                            ),
+                            child: TextButton(
+                                onPressed: () {
+                                  showDialog(
+                                      context: context,
+                                      builder: (context) =>
+                                          const AccountDialog());
+                                },
+                                style: ButtonStyle(
+                                    backgroundColor: MaterialStateProperty.all(
+                                        Colors.transparent),
+                                    shape: MaterialStateProperty.all(
+                                        const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.only(
+                                          bottomLeft:
+                                              Radius.circular(borderRadius),
+                                          bottomRight:
+                                              Radius.circular(borderRadius)),
+                                    )),
+                                    side: MaterialStateProperty.all(
+                                        BorderSide.none),
+                                    padding: MaterialStateProperty.all(
+                                        const EdgeInsets.all(0))),
+                                child: const CircleAvatar(
+                                  radius: 20,
+                                  backgroundImage: NetworkImage(
+                                    "https://cdn.discordapp.com/avatars/242674430566858753/b6e7d53e222626bd84df16cf8607a3e8.png",
+                                  ),
+                                )),
                           ),
                         ))
                   ],
@@ -153,8 +173,7 @@ class _MainPageState extends State<MainPage> {
                                       textStyle: const TextStyle(
                                           color: BrandColors.white,
                                           fontSize: 100,
-                                          height: 0.84,
-                                          letterSpacing: 0),
+                                          height: 0.84),
                                     ))),
                             FadeIn(
                                 delay: const Duration(milliseconds: 400),

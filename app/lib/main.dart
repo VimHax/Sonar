@@ -86,8 +86,6 @@ class Sonar extends StatelessWidget {
                   borderRadius: BorderRadius.circular(borderRadius),
                 )),
                 padding: MaterialStateProperty.all(const EdgeInsets.all(25)),
-                side: MaterialStateProperty.all(
-                    const BorderSide(color: BrandColors.whiteA)),
                 backgroundColor: MaterialStateProperty.all(BrandColors.whiteAA),
                 foregroundColor: MaterialStateProperty.resolveWith((states) {
                   return states.contains(MaterialState.disabled)

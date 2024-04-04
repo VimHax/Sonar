@@ -20,6 +20,8 @@
             body {
                 height: 100vh;
                 width: 100vw;
+                padding: 0;
+                margin: 0;
                 overflow: hidden;
                 font-family: sans-serif;
                 color: white;
@@ -30,6 +32,16 @@
                 text-align: center;
             }
 
+            #container {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background-color: #0f0f0f;
+                width: calc(100vw - 20px);
+                height: calc(100vh - 20px);
+                border-radius: 10px;
+            }
+
             h1 {
                 font-size: 150px;
                 text-transform: uppercase;
@@ -38,18 +50,19 @@
 
             button {
                 transition: background-color 0.1s ease-in-out;
-                border: solid #ffffff19 1px;
-                background-color: black;
+                border: none;
+                background-color: #edf2f40f;
                 color: white;
                 padding: 27px 30px 27px 30px;
                 font-size: 16px;
                 font-weight: bold;
                 text-transform: uppercase;
                 letter-spacing: 3px;
+                border-radius: 10px;
             }
 
             button:hover {
-                background-color: #ffffff19;
+                background-color: #313131;
                 cursor: pointer;
             }
 
@@ -100,15 +113,17 @@
         </script>
     </head>
     <body>
-        <div id="title-container">
-            <span id="title">Sonar</span>
-        </div>
-        <div>
-            <h1 class="bebas-neue-regular">Authorized</h1>
-            <button onclick="openApp()">Open Desktop App</button>
-        </div>
-        <div id="notice-container">
-            <span id="notice">You may now close this tab.</span>
+        <div id="container">
+            <div id="title-container">
+                <span id="title">Sonar</span>
+            </div>
+            <div>
+                <h1 class="bebas-neue-regular">Authorized</h1>
+                <button onclick="openApp()">Open Desktop App</button>
+            </div>
+            <div id="notice-container">
+                <span id="notice">You may now close this tab.</span>
+            </div>
         </div>
     </body>
 </html>

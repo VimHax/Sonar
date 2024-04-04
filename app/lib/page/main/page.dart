@@ -36,10 +36,10 @@ class MainPage extends StatefulWidget {
   const MainPage({super.key});
 
   @override
-  State<MainPage> createState() => MainPageState();
+  State<MainPage> createState() => _MainPageState();
 }
 
-class MainPageState extends State<MainPage> {
+class _MainPageState extends State<MainPage> {
   final User _user = supabase.auth.currentSession!.user;
   StreamSubscription<AuthState>? _sub;
 

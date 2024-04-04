@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:win32_registry/win32_registry.dart';
+import 'package:window_manager/window_manager.dart';
 
 final supabase = Supabase.instance.client;
 const borderWidth = 10.0;
@@ -39,6 +40,7 @@ Future<void> registerSchemeWindows(String scheme) async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await windowManager.ensureInitialized();
 
   await Supabase.initialize(
     url: const String.fromEnvironment("SUPABASE_URL"),

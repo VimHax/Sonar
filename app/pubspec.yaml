@@ -37,6 +37,7 @@ dependencies:
     animate_do: ^3.3.4
     supabase_flutter: ^2.3.4
     win32_registry: ^1.1.2
+    window_manager: ^0.3.8
 
 dev_dependencies:
     flutter_test:

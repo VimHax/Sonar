@@ -13,7 +13,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:win32_registry/win32_registry.dart';
 
 final supabase = Supabase.instance.client;
-const borderWidth = 10.0;
+const borderWidth = 20.0;
 const borderRadius = 10.0;
 
 Future<void> registerSchemeWindows(String scheme) async {

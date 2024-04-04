@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:app/main.dart';
+import 'package:app/util/blur.dart';
 import 'package:app/util/colors.dart';
 import 'package:app/util/hover_button.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
@@ -51,20 +52,22 @@ class TitleBar extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.all(borderWidth),
-              child: Container(
-                constraints: const BoxConstraints.expand(width: 75),
-                decoration: const BoxDecoration(
-                    color: BrandColors.black,
-                    borderRadius:
-                        BorderRadius.all(Radius.circular(borderRadius))),
-                alignment: Alignment.center,
-                child: Text("SONAR",
-                    style: GoogleFonts.montserrat(
-                        textStyle: const TextStyle(
-                            color: BrandColors.white,
-                            fontSize: 10,
-                            letterSpacing: 3,
-                            fontWeight: FontWeight.w600))),
+              child: Blur(
+                child: Container(
+                  constraints: const BoxConstraints.expand(width: 75),
+                  decoration: const BoxDecoration(
+                      color: BrandColors.black,
+                      borderRadius:
+                          BorderRadius.all(Radius.circular(borderRadius))),
+                  alignment: Alignment.center,
+                  child: Text("SONAR",
+                      style: GoogleFonts.montserrat(
+                          textStyle: const TextStyle(
+                              color: BrandColors.white,
+                              fontSize: 10,
+                              letterSpacing: 3,
+                              fontWeight: FontWeight.w600))),
+                ),
               ),
             ),
             Row(
@@ -72,44 +75,46 @@ class TitleBar extends StatelessWidget {
                 Expanded(child: MoveWindow()),
                 Padding(
                   padding: const EdgeInsets.all(borderWidth),
-                  child: Container(
-                    decoration: const BoxDecoration(
-                        color: BrandColors.black,
-                        borderRadius:
-                            BorderRadius.all(Radius.circular(borderRadius))),
-                    child: Row(
-                      children: [
-                        WindowButton(
-                          icon: SvgPicture.asset(
-                            "images/titlebar/minimize.svg",
-                            colorFilter: const ColorFilter.mode(
-                                BrandColors.white, BlendMode.srcIn),
-                            width: 17,
-                            height: 17,
+                  child: Blur(
+                    child: Container(
+                      decoration: const BoxDecoration(
+                          color: BrandColors.black,
+                          borderRadius:
+                              BorderRadius.all(Radius.circular(borderRadius))),
+                      child: Row(
+                        children: [
+                          WindowButton(
+                            icon: SvgPicture.asset(
+                              "images/titlebar/minimize.svg",
+                              colorFilter: const ColorFilter.mode(
+                                  BrandColors.white, BlendMode.srcIn),
+                              width: 17,
+                              height: 17,
+                            ),
+                            onPressed: () => appWindow.minimize(),
                           ),
-                          onPressed: () => appWindow.minimize(),
-                        ),
-                        WindowButton(
-                          icon: SvgPicture.asset(
-                            "images/titlebar/maximize.svg",
-                            colorFilter: const ColorFilter.mode(
-                                BrandColors.white, BlendMode.srcIn),
-                            width: 17,
-                            height: 17,
+                          WindowButton(
+                            icon: SvgPicture.asset(
+                              "images/titlebar/maximize.svg",
+                              colorFilter: const ColorFilter.mode(
+                                  BrandColors.white, BlendMode.srcIn),
+                              width: 17,
+                              height: 17,
+                            ),
+                            onPressed: () => appWindow.maximizeOrRestore(),
                           ),
-                          onPressed: () => appWindow.maximizeOrRestore(),
-                        ),
-                        WindowButton(
-                          icon: SvgPicture.asset(
-                            "images/titlebar/close.svg",
-                            colorFilter: const ColorFilter.mode(
-                                BrandColors.white, BlendMode.srcIn),
-                            width: 17,
-                            height: 17,
-                          ),
-                          onPressed: () => appWindow.close(),
-                        )
-                      ],
+                          WindowButton(
+                            icon: SvgPicture.asset(
+                              "images/titlebar/close.svg",
+                              colorFilter: const ColorFilter.mode(
+                                  BrandColors.white, BlendMode.srcIn),
+                              width: 17,
+                              height: 17,
+                            ),
+                            onPressed: () => appWindow.close(),
+                          )
+                        ],
+                      ),
                     ),
                   ),
                 ),

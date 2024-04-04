@@ -29,16 +29,17 @@ class MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(0, 35, 0, 0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Container(
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+              borderWidth, 0, borderWidth, borderWidth),
+          child: Container(
             width: 75,
             decoration: const BoxDecoration(
-                color: BrandColors.blackA,
-                border: Border(right: BorderSide(color: BrandColors.whiteA))),
+                color: BrandColors.black,
+                borderRadius: BorderRadius.all(Radius.circular(borderRadius))),
             child: Stack(
               children: [
                 Container(
@@ -56,6 +57,8 @@ class MainPageState extends State<MainPage> {
                         child: TextButton(
                             onPressed: () {},
                             style: ButtonStyle(
+                                // overlayColor: MaterialStateProperty.all(
+                                //     BrandColors.blackA),
                                 side:
                                     MaterialStateProperty.all(BorderSide.none),
                                 maximumSize: null,
@@ -64,6 +67,7 @@ class MainPageState extends State<MainPage> {
                             child: const Icon(
                               Icons.play_arrow_sharp,
                               size: 35,
+                              // color: BrandColors.black,
                             )),
                       ),
                       AspectRatio(
@@ -71,6 +75,8 @@ class MainPageState extends State<MainPage> {
                         child: TextButton(
                             onPressed: () {},
                             style: ButtonStyle(
+                                // overlayColor: MaterialStateProperty.all(
+                                //     BrandColors.blackA),
                                 side:
                                     MaterialStateProperty.all(BorderSide.none),
                                 maximumSize: null,
@@ -79,6 +85,7 @@ class MainPageState extends State<MainPage> {
                             child: const Icon(
                               Icons.library_music_sharp,
                               size: 35,
+                              // color: BrandColors.black,
                             )),
                       ),
                       AspectRatio(
@@ -86,6 +93,8 @@ class MainPageState extends State<MainPage> {
                         child: TextButton(
                             onPressed: () {},
                             style: ButtonStyle(
+                                // overlayColor: MaterialStateProperty.all(
+                                //     BrandColors.blackA),
                                 side:
                                     MaterialStateProperty.all(BorderSide.none),
                                 maximumSize: null,
@@ -94,6 +103,7 @@ class MainPageState extends State<MainPage> {
                             child: const Icon(
                               Icons.group_sharp,
                               size: 35,
+                              // color: BrandColors.black,
                             )),
                       )
                     ],
@@ -117,62 +127,60 @@ class MainPageState extends State<MainPage> {
               ],
             ),
           ),
-          Expanded(
-            child: Stack(
-              children: [
-                Container(
-                  color: Colors.transparent,
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(64.0),
-                  child: Column(
+        ),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(0, 0, borderWidth, borderWidth),
+            child: Container(
+              decoration: const BoxDecoration(
+                  color: BrandColors.black,
+                  borderRadius:
+                      BorderRadius.all(Radius.circular(borderRadius))),
+              padding: const EdgeInsets.all(64.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Text("Sounds",
+                          style: GoogleFonts.bebasNeue(
+                            textStyle: const TextStyle(
+                                color: BrandColors.white,
+                                fontSize: 100,
+                                height: 0.84,
+                                letterSpacing: 0),
+                          )),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text("Sounds",
-                              style: GoogleFonts.bebasNeue(
-                                textStyle: const TextStyle(
-                                    color: BrandColors.white,
-                                    fontSize: 100,
-                                    height: 0.84,
-                                    letterSpacing: 0),
-                              )),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              TextButton(
-                                  onPressed: () {},
-                                  style: ButtonStyle(
-                                      padding: MaterialStateProperty.all(
-                                          const EdgeInsets.all(30))),
-                                  child: const Icon(
-                                    Icons.add_sharp,
-                                    size: 30,
-                                  ))
-                            ],
-                          )
+                          TextButton(
+                              onPressed: () {},
+                              style: ButtonStyle(
+                                  padding: MaterialStateProperty.all(
+                                      const EdgeInsets.all(30))),
+                              child: const Icon(
+                                Icons.add_sharp,
+                                size: 30,
+                              ))
                         ],
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      Expanded(
-                          child: Container(
-                              decoration: BoxDecoration(
-                                  color: BrandColors.blackA,
-                                  border:
-                                      Border.all(color: BrandColors.whiteA))))
+                      )
                     ],
                   ),
-                ),
-              ],
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Expanded(
+                      child: Container(
+                          decoration: BoxDecoration(
+                              border: Border.all(color: BrandColors.whiteA))))
+                ],
+              ),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

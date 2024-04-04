@@ -77,17 +77,18 @@ class Sonar extends StatelessWidget {
           // splashFactory: NoSplash.splashFactory,
           textButtonTheme: TextButtonThemeData(
             style: ButtonStyle(
-                overlayColor:
-                    MaterialStateProperty.all(BrandColors.white.withAlpha(25)),
+                overlayColor: MaterialStateProperty.all(BrandColors.whiteA),
                 shape: MaterialStateProperty.all(RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(0),
                 )),
                 padding: MaterialStateProperty.all(const EdgeInsets.all(25)),
                 side: MaterialStateProperty.all(
-                    BorderSide(color: BrandColors.white.withAlpha(50))),
+                    const BorderSide(color: BrandColors.whiteA)),
+                backgroundColor: MaterialStateProperty.all(BrandColors.blackA),
                 foregroundColor: MaterialStateProperty.resolveWith((states) {
-                  return BrandColors.white.withAlpha(
-                      states.contains(MaterialState.disabled) ? 50 : 255);
+                  return states.contains(MaterialState.disabled)
+                      ? BrandColors.whiteA
+                      : BrandColors.white;
                 })),
           ),
           colorScheme: ColorScheme.fromSwatch(

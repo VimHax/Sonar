@@ -7,12 +7,5 @@ class Background extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(color: BrandColors.black);
-    return Container(
-        decoration: const BoxDecoration(
-            image: DecorationImage(
-                fit: BoxFit.cover,
-                image: AssetImage(
-                  "images/background.png",
-                ))));
   }
 }

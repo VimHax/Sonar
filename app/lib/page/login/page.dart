@@ -60,44 +60,38 @@ class LoginPageState extends State<LoginPage> {
                     height: 40,
                     child: CircularProgressIndicator(),
                   )
-                : ClipRect(
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
-                      child: TextButton(
-                          onPressed: _loading
-                              ? null
-                              : () async {
-                                  setState(() {
-                                    _loading = true;
-                                  });
-                                  try {
-                                    stdout.writeln("Signing In!");
-                                    await supabase.auth.signInWithOAuth(
-                                        OAuthProvider.discord,
-                                        redirectTo:
-                                            'com.vimhax.sonar://login-callback');
-                                    stdout.writeln("Signed In!");
-                                  } catch (e) {
-                                    setState(() {
-                                      _loading = false;
-                                    });
-                                    if (context.mounted) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(const SnackBar(
-                                        content: Text('Login failed'),
-                                        backgroundColor: BrandColors.red,
-                                      ));
-                                    }
-                                  }
-                                },
-                          child: Text("Login with Discord".toUpperCase(),
-                              style: GoogleFonts.montserrat(
-                                  textStyle: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                      letterSpacing: 2)))),
-                    ),
-                  ),
+                : TextButton(
+                    onPressed: _loading
+                        ? null
+                        : () async {
+                            setState(() {
+                              _loading = true;
+                            });
+                            try {
+                              stdout.writeln("Signing In!");
+                              await supabase.auth.signInWithOAuth(
+                                  OAuthProvider.discord,
+                                  redirectTo: 'https://sonar-xi.vercel.app/');
+                              stdout.writeln("Signed In!");
+                            } catch (e) {
+                              setState(() {
+                                _loading = false;
+                              });
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(const SnackBar(
+                                  content: Text('Login failed'),
+                                  backgroundColor: BrandColors.red,
+                                ));
+                              }
+                            }
+                          },
+                    child: Text("Login with Discord".toUpperCase(),
+                        style: GoogleFonts.montserrat(
+                            textStyle: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 2)))),
           ),
         )
       ],

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class BrandColors {
   static const white = Color(0xFFEDF2F4);
+  static const whiteA = Color(0x19EDF2F4);
   static const brightRed = Color(0xFFf25467);
   static const red = Color(0xFFEF233C);
   static const darkRed = Color(0xFFB40421);
@@ -11,4 +12,5 @@ class BrandColors {
   static const darkerBlue = Color(0xFF08080C);
   static const grey = Color(0xFF222222);
   static const black = Color(0xFF000000);
+  static const blackA = Color(0x32000000);
 }

@@ -53,24 +53,16 @@ class InitialPage extends StatelessWidget {
           padding: const EdgeInsets.only(bottom: 50),
           child: FadeIn(
             delay: Durations.long4,
-            child: ClipRect(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
-                child: Padding(
-                  padding: const EdgeInsets.all(1.0),
-                  child: TextButton(
-                      onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/login");
-                      },
-                      child: Text("Continue".toUpperCase(),
-                          style: GoogleFonts.montserrat(
-                              textStyle: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  letterSpacing: 2)))),
-                ),
-              ),
-            ),
+            child: TextButton(
+                onPressed: () {
+                  Navigator.pushReplacementNamed(context, "/login");
+                },
+                child: Text("Continue".toUpperCase(),
+                    style: GoogleFonts.montserrat(
+                        textStyle: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 2)))),
           ),
         )
       ],

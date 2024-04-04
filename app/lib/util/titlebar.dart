@@ -41,59 +41,72 @@ class TitleBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
         height: 35,
-        decoration: BoxDecoration(
-            color: BrandColors.black.withAlpha(50),
+        decoration: const BoxDecoration(
+            color: BrandColors.blackA,
             border: Border(
-                bottom: BorderSide(
-                    color: BrandColors.white.withAlpha(50), width: 1))),
-        child: ClipRect(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
-            child: Stack(
-              children: [
-                Container(
-                  alignment: Alignment.centerLeft,
-                  padding: const EdgeInsets.only(left: 13),
-                  child: Text("SONAR",
+                bottom: BorderSide(color: BrandColors.whiteA, width: 1))),
+        child: Stack(
+          children: [
+            Container(
+              alignment: Alignment.centerLeft,
+              padding: const EdgeInsets.only(left: 11),
+              // padding: const EdgeInsets.only(left: 8.5),
+              child: Row(
+                children: [
+                  // Container(
+                  //   width: 18,
+                  //   height: 18,
+                  //   alignment: Alignment.center,
+                  //   decoration: BoxDecoration(
+                  //       color: BrandColors.white,
+                  //       borderRadius: BorderRadius.all(Radius.circular(5))),
+                  //   child: const Icon(
+                  //     Icons.music_note_sharp,
+                  //     size: 16,
+                  //     color: BrandColors.black,
+                  //   ),
+                  // ),
+                  // const SizedBox(width: 8.5),
+                  Text("SONAR",
                       style: GoogleFonts.montserrat(
                           textStyle: const TextStyle(
                               color: BrandColors.white,
                               fontSize: 10,
                               letterSpacing: 3,
-                              fontWeight: FontWeight.w600))),
-                ),
-                Row(
-                  children: [
-                    Expanded(child: MoveWindow()),
-                    WindowButton(
-                      icon: SvgPicture.asset(
-                        "images/titlebar/minimize.svg",
-                        width: 17,
-                        height: 17,
-                      ),
-                      onPressed: () => appWindow.minimize(),
-                    ),
-                    WindowButton(
-                      icon: SvgPicture.asset(
-                        "images/titlebar/maximize.svg",
-                        width: 17,
-                        height: 17,
-                      ),
-                      onPressed: () => appWindow.maximizeOrRestore(),
-                    ),
-                    WindowButton(
-                      icon: SvgPicture.asset(
-                        "images/titlebar/close.svg",
-                        width: 17,
-                        height: 17,
-                      ),
-                      onPressed: () => appWindow.close(),
-                    ),
-                  ],
-                )
-              ],
+                              fontWeight: FontWeight.w600)))
+                ],
+              ),
             ),
-          ),
+            Row(
+              children: [
+                Expanded(child: MoveWindow()),
+                WindowButton(
+                  icon: SvgPicture.asset(
+                    "images/titlebar/minimize.svg",
+                    width: 17,
+                    height: 17,
+                  ),
+                  onPressed: () => appWindow.minimize(),
+                ),
+                WindowButton(
+                  icon: SvgPicture.asset(
+                    "images/titlebar/maximize.svg",
+                    width: 17,
+                    height: 17,
+                  ),
+                  onPressed: () => appWindow.maximizeOrRestore(),
+                ),
+                WindowButton(
+                  icon: SvgPicture.asset(
+                    "images/titlebar/close.svg",
+                    width: 17,
+                    height: 17,
+                  ),
+                  onPressed: () => appWindow.close(),
+                ),
+              ],
+            )
+          ],
         ));
   }
 }

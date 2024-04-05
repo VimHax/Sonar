@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:app/page/initial/page.dart';
 import 'package:app/page/login/page.dart';
+import 'package:app/page/main/member.dart';
 import 'package:app/page/main/page.dart';
 import 'package:app/util/background.dart';
 import 'package:app/util/colors.dart';
@@ -9,6 +10,7 @@ import 'package:app/util/titlebar.dart';
 import 'package:app/util/transition.dart';
 import 'package:flutter/material.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
+import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:win32_registry/win32_registry.dart';
 import 'package:window_manager/window_manager.dart';
@@ -58,7 +60,8 @@ void main() async {
     }
   });
 
-  runApp(const Sonar());
+  runApp(ChangeNotifierProvider(
+      create: (context) => MemberModel(), child: const Sonar()));
 
   doWhenWindowReady(() {
     const initialSize = Size(1280, 720);

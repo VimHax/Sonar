@@ -1,8 +1,10 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:app/main.dart';
 import 'package:app/page/main/account_dialog.dart';
+import 'package:app/page/main/member.dart';
 import 'package:app/util/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 const fadeStagger = 100;
 
@@ -125,11 +127,20 @@ class Tabs extends StatelessWidget {
                           side: MaterialStateProperty.all(BorderSide.none),
                           padding: MaterialStateProperty.all(
                               const EdgeInsets.all(0))),
-                      child: const CircleAvatar(
-                        radius: 20,
-                        backgroundImage: NetworkImage(
-                          "https://cdn.discordapp.com/avatars/242674430566858753/b6e7d53e222626bd84df16cf8607a3e8.png",
-                        ),
+                      child: Consumer<MemberModel>(
+                        builder: (context, member, child) =>
+                            member.value == null
+                                ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(),
+                                  )
+                                : CircleAvatar(
+                                    radius: 20,
+                                    backgroundImage: NetworkImage(
+                                      member.value!.avatar,
+                                    ),
+                                  ),
                       )),
                 ),
               ))

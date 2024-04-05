@@ -1,0 +1,8 @@
+{
+    "imports": {
+        "supabase": "https://esm.sh/@supabase/supabase-js@2.42.0",
+        "discord-api-types/v10": "npm:discord-api-types@0.37.79/v10",
+        "discordjs/rest": "npm:@discordjs/rest@2.2.0",
+        "zod": "https://deno.land/x/zod@v3.22.4/mod.ts"
+    }
+}

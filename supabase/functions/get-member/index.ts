@@ -8,8 +8,9 @@ import {
     APIUser,
     RouteBases,
 } from "discord-api-types/v10";
-import { nonNull } from "../_shared/util.ts";
-import supabaseClient from "../_shared/supabaseClient.ts";
+import { nonNull, getMemberID, serve } from "../_shared/util.ts";
+import { createResponse } from "../_shared/util.ts";
+import { HTTPStatus } from "../_shared/util.ts";
 
 const rest = new REST({ version: "10" }).setToken(
     nonNull(Deno.env.get("DISCORD_BOT_TOKEN"))
@@ -51,48 +52,23 @@ function getBannerRoute(user: APIUser): string | null {
     }
 }
 
-Deno.serve(async (req) => {
-    try {
-        const userClient = supabaseClient(req);
-        const {
-            data: { user },
-            error,
-        } = await userClient.auth.getUser();
-        if (error) throw error;
+serve(async (req) => {
+    const { memberID } = await getMemberID(req);
 
-        if (user === null) throw new Error("Unable to retrieve user.");
-        if (
-            !user.identities ||
-            user.identities.length != 1 ||
-            user.identities[0].provider !== "discord"
-        ) {
-            throw new Error("Unable to retrieve user identity.");
-        }
+    const user = (await rest.get(
+        Routes.user(memberID)
+    )) as RESTGetAPIUserResult;
 
-        const res = (await rest.get(
-            Routes.user(user.identities[0].id)
-        )) as RESTGetAPIUserResult;
+    const avatarRoute = getAvatarRoute(user);
+    const bannerRoute = getBannerRoute(user);
 
-        const avatarRoute = getAvatarRoute(res);
-        const bannerRoute = getBannerRoute(res);
+    const response = {
+        username: user.username,
+        global_name: user.global_name,
+        avatar: `${RouteBases.cdn}${avatarRoute}`,
+        banner: bannerRoute === null ? null : `${RouteBases.cdn}${bannerRoute}`,
+        accent_color: user.accent_color ?? null,
+    };
 
-        const data = {
-            username: res.username,
-            global_name: res.global_name,
-            avatar: `${RouteBases.cdn}${avatarRoute}`,
-            banner:
-                bannerRoute === null ? null : `${RouteBases.cdn}${bannerRoute}`,
-            accent_color: res.accent_color ?? null,
-        };
-
-        return new Response(JSON.stringify(data), {
-            headers: { "Content-Type": "application/json" },
-        });
-    } catch (error) {
-        console.error(error);
-        return new Response(null, {
-            headers: { "Content-Type": "application/json" },
-            status: 500,
-        });
-    }
+    return createResponse(response, HTTPStatus.Ok);
 });

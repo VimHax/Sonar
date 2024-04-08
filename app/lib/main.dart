@@ -10,12 +10,16 @@ import 'package:app/util/titlebar.dart';
 import 'package:app/util/transition.dart';
 import 'package:flutter/material.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:win32_registry/win32_registry.dart';
 import 'package:window_manager/window_manager.dart';
 
 final supabase = Supabase.instance.client;
+const supabaseURL = String.fromEnvironment("SUPABASE_URL");
+const supabaseAnonKey = String.fromEnvironment("SUPABASE_ANON_KEY");
+const supabaseFunctionsURL = '$supabaseURL/functions/v1';
 const borderWidth = 10.0;
 const borderRadius = 10.0;
 
@@ -45,8 +49,8 @@ void main() async {
   await windowManager.ensureInitialized();
 
   await Supabase.initialize(
-    url: const String.fromEnvironment("SUPABASE_URL"),
-    anonKey: const String.fromEnvironment("SUPABASE_ANON_KEY"),
+    url: supabaseURL,
+    anonKey: supabaseAnonKey,
   );
 
   supabase.auth.onAuthStateChange.listen((data) {
@@ -96,6 +100,27 @@ class Sonar extends StatelessWidget {
                       : BrandColors.white;
                 })),
           ),
+          textTheme: GoogleFonts.montserratTextTheme(ThemeData(
+                  colorScheme: ColorScheme.fromSwatch(
+                      primarySwatch: Colors.grey, brightness: Brightness.dark))
+              .textTheme),
+          inputDecorationTheme: const InputDecorationTheme(
+              contentPadding: EdgeInsets.only(left: 15),
+              filled: true,
+              fillColor: BrandColors.blackA,
+              floatingLabelStyle: TextStyle(color: BrandColors.white),
+              hoverColor: BrandColors.whiteA,
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(borderRadius)),
+                borderSide: BorderSide.none,
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(borderRadius)),
+                borderSide: BorderSide(width: 1, color: BrandColors.white),
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(borderRadius)),
+              )),
           colorScheme: ColorScheme.fromSwatch(
               primarySwatch: Colors.grey, brightness: Brightness.dark),
           pageTransitionsTheme: PageTransitionsTheme(builders: {

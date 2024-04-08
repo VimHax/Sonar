@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:animate_do/animate_do.dart';
 import 'package:app/main.dart';
 import 'package:app/util/colors.dart';
+import 'package:app/util/snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -92,11 +93,8 @@ class _LoginPageState extends State<LoginPage> {
                                       _loading = false;
                                     });
                                     if (context.mounted) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(const SnackBar(
-                                        content: Text('Login failed'),
-                                        backgroundColor: BrandColors.red,
-                                      ));
+                                      showErrorSnackBar(
+                                          context, 'Failed to login.');
                                     }
                                   }
                                 },

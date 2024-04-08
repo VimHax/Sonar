@@ -137,6 +137,7 @@ class Tabs extends StatelessWidget {
                                   )
                                 : CircleAvatar(
                                     radius: 20,
+                                    backgroundColor: BrandColors.blackA,
                                     backgroundImage: NetworkImage(
                                       member.value!.avatar,
                                     ),

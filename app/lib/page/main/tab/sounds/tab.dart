@@ -1,5 +1,6 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:app/main.dart';
+import 'package:app/page/main/tab/sounds/add_sound_dialog.dart';
 import 'package:app/util/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -43,7 +44,12 @@ class _SoundsTabState extends State<SoundsTab> {
                       child: AspectRatio(
                         aspectRatio: 1,
                         child: TextButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              showDialog(
+                                  barrierDismissible: false,
+                                  context: context,
+                                  builder: (context) => const AddSoundDialog());
+                            },
                             style: ButtonStyle(
                                 padding: MaterialStateProperty.all(
                                     const EdgeInsets.all(0))),

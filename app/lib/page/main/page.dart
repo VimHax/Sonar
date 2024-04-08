@@ -21,7 +21,7 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   StreamSubscription<AuthState>? _sub;
-  TabType _tab = TabType.sounds;
+  TabType _tab = TabType.soundboard;
 
   @override
   void initState() {

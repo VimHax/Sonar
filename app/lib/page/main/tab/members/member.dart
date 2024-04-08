@@ -1,8 +1,13 @@
+import 'package:app/models/intros.dart';
 import 'package:app/models/members.dart';
+import 'package:app/models/sounds.dart';
 import 'package:app/page/main/tab/members/member_dialog.dart';
+import 'package:app/page/main/tab/sounds/edit_sound_dialog.dart';
 import 'package:app/util/colors.dart';
+import 'package:app/util/storage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 class MemberRow extends StatefulWidget {
   const MemberRow({super.key, required this.member});
@@ -18,19 +23,21 @@ class _MemberRowState extends State<MemberRow> {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 80,
-      child: Stack(
-        children: [
-          TextButton(
-            style: ButtonStyle(
-                padding: MaterialStateProperty.all(const EdgeInsets.all(0))),
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) => MemberDialog(member: widget.member),
-              );
-            },
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
+      child: TextButton(
+        style: ButtonStyle(
+            padding: MaterialStateProperty.all(const EdgeInsets.all(0))),
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (context) => MemberDialog(member: widget.member),
+          );
+        },
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 AspectRatio(
@@ -88,23 +95,84 @@ class _MemberRowState extends State<MemberRow> {
                             height: 4,
                           )
                         ],
-                )
+                ),
               ],
             ),
-          ),
-          Container(
-            alignment: Alignment.centerRight,
-            padding: const EdgeInsets.only(right: 25),
-            child: DropdownButton(
-                value: "None",
-                onChanged: (value) {},
-                // requestFocusOnTap: false,
-                items: const [
-                  DropdownMenuItem(value: "None", child: Text("None")),
-                  DropdownMenuItem(value: "Sound 1", child: Text("Sound 1"))
-                ]),
-          )
-        ],
+            Row(
+              children: [
+                Text("intro:",
+                    style: GoogleFonts.montserrat(
+                      textStyle: const TextStyle(
+                          color: BrandColors.whiteA, fontSize: 16),
+                    )),
+                const SizedBox(
+                  width: 15,
+                ),
+                Consumer2<SoundsModel, IntrosModel>(
+                  builder: (context, sounds, intros, child) {
+                    if (sounds.all == null || intros.all == null) {
+                      return const Padding(
+                        padding: EdgeInsets.only(right: 10),
+                        child: SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
+                    }
+                    Intro? intro = intros.get(widget.member.id);
+                    if (intro == null) {
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 15),
+                        child: Text("None",
+                            style: GoogleFonts.montserrat(
+                              textStyle: const TextStyle(
+                                  color: BrandColors.white, fontSize: 16),
+                            )),
+                      );
+                    }
+                    Sound sound = sounds.get(intro.sound)!;
+                    return TextButton(
+                        style: ButtonStyle(
+                            shape: MaterialStateProperty.all(
+                                RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(36),
+                            )),
+                            padding: MaterialStateProperty.all(
+                                const EdgeInsets.fromLTRB(4, 11, 15, 11))),
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) => EditSoundDialog(sound: sound),
+                          );
+                        },
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            CircleAvatar(
+                              radius: 15,
+                              backgroundImage:
+                                  NetworkImage(getThumbnail(sound)),
+                            ),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            Text(sound.name,
+                                style: GoogleFonts.montserrat(
+                                  textStyle: const TextStyle(
+                                      color: BrandColors.white, fontSize: 14),
+                                ))
+                          ],
+                        ));
+                  },
+                ),
+                const SizedBox(
+                  width: 20,
+                ),
+              ],
+            )
+          ],
+        ),
       ),
     );
   }

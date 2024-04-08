@@ -1,10 +1,12 @@
+import 'dart:async';
+
 import 'package:app/main.dart';
 import 'package:app/models/members.dart';
 import 'package:app/models/sounds.dart';
 import 'package:app/page/main/tab/members/member_dialog.dart';
 import 'package:app/page/main/tab/sounds/edit_sound_dialog.dart';
 import 'package:app/util/colors.dart';
-import 'package:app/util/id.dart';
+import 'package:app/util/storage.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -24,12 +26,13 @@ class SoundRow extends StatefulWidget {
 class _SoundRowState extends State<SoundRow> {
   late final AudioPlayer _player;
   SoundState _state = SoundState.none;
+  StreamSubscription? _sub;
 
   @override
   void initState() {
     _player = AudioPlayer();
     _player.setVolume(0.1);
-    _player.onPlayerStateChanged.listen((event) {
+    _sub = _player.onPlayerStateChanged.listen((event) {
       if (event == PlayerState.playing) {
         setState(() => _state = SoundState.playing);
       } else if (event == PlayerState.stopped) {
@@ -43,6 +46,7 @@ class _SoundRowState extends State<SoundRow> {
 
   @override
   void dispose() {
+    _sub?.cancel();
     _player.dispose();
     super.dispose();
   }
@@ -75,10 +79,7 @@ class _SoundRowState extends State<SoundRow> {
                   child: Center(
                     child: CircleAvatar(
                       radius: 25,
-                      backgroundImage: NetworkImage(supabase.storage
-                          .from("thumbnail")
-                          .getPublicUrl(
-                              "${widget.sound.author}/${widget.sound.thumbnail}")),
+                      backgroundImage: NetworkImage(getThumbnail(widget.sound)),
                     ),
                   ),
                 ),
@@ -173,10 +174,8 @@ class _SoundRowState extends State<SoundRow> {
                             : () async {
                                 if (_state == SoundState.none) {
                                   setState(() => _state = SoundState.loading);
-                                  _player.play(UrlSource(supabase.storage
-                                      .from("audio")
-                                      .getPublicUrl(
-                                          "${widget.sound.author}/${widget.sound.audio}")));
+                                  _player
+                                      .play(UrlSource(getAudio(widget.sound)));
                                 } else if (_state == SoundState.playing) {
                                   _player.stop();
                                 }

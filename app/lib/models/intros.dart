@@ -1,11 +1,11 @@
 // ignore_for_file: non_constant_identifier_names
 
 import 'dart:async';
-import 'dart:collection';
 
 import 'package:app/main.dart';
 import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:collection/collection.dart';
 
 part 'intros.g.dart';
 
@@ -34,6 +34,10 @@ class IntrosModel extends ChangeNotifier {
         _startTracking();
       }
     });
+  }
+
+  Intro? get(String id) {
+    return _intros!.firstWhereOrNull((e) => e.id == id);
   }
 
   void _startTracking() {

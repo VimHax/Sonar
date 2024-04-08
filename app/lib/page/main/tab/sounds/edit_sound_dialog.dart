@@ -8,6 +8,7 @@ import 'package:app/models/sounds.dart';
 import 'package:app/util/edge_functions.dart';
 import 'package:app/util/colors.dart';
 import 'package:app/util/snackbar.dart';
+import 'package:app/util/storage.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -88,10 +89,8 @@ class _EditSoundDialogState extends State<EditSoundDialog> {
                                       image: DecorationImage(
                                           fit: BoxFit.cover,
                                           image: _thumbnail == null
-                                              ? NetworkImage(supabase.storage
-                                                      .from("thumbnail")
-                                                      .getPublicUrl(
-                                                          "${widget.sound.author}/${widget.sound.thumbnail}"))
+                                              ? NetworkImage(getThumbnail(
+                                                      widget.sound))
                                                   as ImageProvider
                                               : MemoryImage(_thumbnail!))),
                                 ),

@@ -2,13 +2,11 @@ import 'dart:async';
 
 import 'package:animate_do/animate_do.dart';
 import 'package:app/main.dart';
-import 'package:app/page/main/tab/audit_log/tab.dart';
 import 'package:app/page/main/tab/members/tab.dart';
 import 'package:app/page/main/tab/soundboard/tab.dart';
 import 'package:app/page/main/tab/sounds/tab.dart';
 import 'package:app/page/main/tabs.dart';
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -18,7 +16,7 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  StreamSubscription<AuthState>? _sub;
+  StreamSubscription? _sub;
   TabType _tab = TabType.soundboard;
 
   @override
@@ -62,8 +60,7 @@ class _MainPageState extends State<MainPage> {
               child: switch (_tab) {
                 TabType.soundboard => const SoundboardTab(),
                 TabType.sounds => const SoundsTab(),
-                TabType.members => const MembersTab(),
-                TabType.auditLog => const AuditLogTab(),
+                TabType.members => const MembersTab()
               },
             ),
           ),

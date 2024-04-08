@@ -46,6 +46,8 @@ dependencies:
     flutter_layout_grid: ^2.0.6
     http_parser: ^4.0.2
     audioplayers: ^6.0.0
+    collection: ^1.18.0
+    dropdown_button2: ^2.3.9
 
 dev_dependencies:
     flutter_test:

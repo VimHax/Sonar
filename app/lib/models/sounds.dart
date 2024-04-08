@@ -1,9 +1,9 @@
 // ignore_for_file: non_constant_identifier_names
 
 import 'dart:async';
-import 'dart:collection';
 
 import 'package:app/main.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -42,6 +42,10 @@ class SoundsModel extends ChangeNotifier {
         _startTracking();
       }
     });
+  }
+
+  Sound? get(String id) {
+    return _sounds!.firstWhereOrNull((e) => e.id == id);
   }
 
   void _startTracking() {

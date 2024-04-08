@@ -8,7 +8,7 @@ import 'package:provider/provider.dart';
 
 const fadeStagger = 100;
 
-enum TabType { soundboard, sounds, members, auditLog }
+enum TabType { soundboard, sounds, members }
 
 class TabButton extends StatelessWidget {
   const TabButton(
@@ -92,13 +92,6 @@ class Tabs extends StatelessWidget {
                       icon: Icons.group_sharp,
                       selected: selected == TabType.members,
                       onPressed: () => onSelected(TabType.members),
-                    )),
-                FadeIn(
-                    delay: const Duration(milliseconds: fadeStagger * 4),
-                    child: TabButton(
-                      icon: Icons.list_sharp,
-                      selected: selected == TabType.auditLog,
-                      onPressed: () => onSelected(TabType.auditLog),
                     )),
               ],
             ),

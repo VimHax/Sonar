@@ -18,7 +18,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool _loading = false;
-  StreamSubscription<AuthState>? _sub;
+  StreamSubscription? _sub;
 
   @override
   void initState() {

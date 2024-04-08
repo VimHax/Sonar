@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:animate_do/animate_do.dart';
 import 'package:app/main.dart';
-import 'package:app/page/main/member.dart';
+import 'package:app/page/main/members.dart';
 import 'package:app/util/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -25,7 +25,7 @@ class AccountDialog extends StatelessWidget {
                 borderRadius: BorderRadius.all(Radius.circular(borderRadius)),
               ),
               width: 550,
-              child: Consumer<MemberModel>(
+              child: Consumer<MembersModel>(
                 builder: (context, member, child) => Stack(
                   children: [
                     Column(
@@ -36,22 +36,22 @@ class AccountDialog extends StatelessWidget {
                           child: Container(
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
-                                color: member.value == null
+                                color: member.me == null
                                     ? BrandColors.blackA
-                                    : member.value!.accent_color == null
+                                    : member.me!.accent_color == null
                                         ? BrandColors.blackA
                                         : Color(0xFF000000 +
-                                            member.value!.accent_color!),
+                                            member.me!.accent_color!),
                                 borderRadius: const BorderRadius.vertical(
                                     top: Radius.circular(borderRadius)),
-                                image: member.value == null ||
-                                        member.value!.banner == null
+                                image: member.me == null ||
+                                        member.me!.banner == null
                                     ? null
                                     : DecorationImage(
                                         fit: BoxFit.cover,
                                         image: NetworkImage(
-                                            "${member.value!.banner!}?size=4096"))),
-                            child: member.value == null
+                                            "${member.me!.banner!}?size=4096"))),
+                            child: member.me == null
                                 ? const SizedBox(
                                     width: 40,
                                     height: 40,
@@ -76,7 +76,7 @@ class AccountDialog extends StatelessWidget {
                                     MainAxisAlignment.spaceBetween,
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
-                                  member.value == null
+                                  member.me == null
                                       ? const AspectRatio(
                                           aspectRatio: 1,
                                           child: Center(
@@ -94,10 +94,10 @@ class AccountDialog extends StatelessWidget {
                                               MainAxisAlignment.center,
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
-                                          children: member.value!.global_name ==
+                                          children: member.me!.global_name ==
                                                   null
                                               ? [
-                                                  Text(member.value!.username,
+                                                  Text(member.me!.username,
                                                       style: GoogleFonts
                                                           .montserrat(
                                                         textStyle:
@@ -113,7 +113,7 @@ class AccountDialog extends StatelessWidget {
                                                       ))
                                                 ]
                                               : [
-                                                  Text(member.value!.username,
+                                                  Text(member.me!.username,
                                                       style: GoogleFonts
                                                           .montserrat(
                                                         textStyle:
@@ -123,9 +123,7 @@ class AccountDialog extends StatelessWidget {
                                                                         .white,
                                                                 fontSize: 16),
                                                       )),
-                                                  Text(
-                                                      member
-                                                          .value!.global_name!,
+                                                  Text(member.me!.global_name!,
                                                       style: GoogleFonts
                                                           .montserrat(
                                                         textStyle:
@@ -171,12 +169,12 @@ class AccountDialog extends StatelessWidget {
                           child: CircleAvatar(
                             radius: 55,
                             backgroundColor: BrandColors.blackA,
-                            backgroundImage: member.value == null
+                            backgroundImage: member.me == null
                                 ? null
                                 : NetworkImage(
-                                    member.value!.avatar,
+                                    member.me!.avatar,
                                   ),
-                            child: member.value != null
+                            child: member.me != null
                                 ? null
                                 : const SizedBox(
                                     width: 30,

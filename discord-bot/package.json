@@ -17,6 +17,7 @@
 	"dependencies": {
 		"@supabase/supabase-js": "^2.41.1",
 		"discord.js": "^14.14.1",
-		"dotenv": "^16.4.5"
+		"dotenv": "^16.4.5",
+		"zod": "^3.22.4"
 	}
 }

@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:app/page/initial/page.dart';
 import 'package:app/page/login/page.dart';
-import 'package:app/page/main/member.dart';
+import 'package:app/page/main/members.dart';
 import 'package:app/page/main/page.dart';
 import 'package:app/util/background.dart';
 import 'package:app/util/colors.dart';
@@ -53,19 +53,8 @@ void main() async {
     anonKey: supabaseAnonKey,
   );
 
-  supabase.auth.onAuthStateChange.listen((data) {
-    final AuthChangeEvent event = data.event;
-    final Session? session = data.session;
-    if (event == AuthChangeEvent.signedIn) {
-      // handle signIn event
-    }
-    if (session != null) {
-      stdout.writeln(session.user.identities!.elementAt(0).id);
-    }
-  });
-
   runApp(ChangeNotifierProvider(
-      create: (context) => MemberModel(), child: const Sonar()));
+      create: (context) => MembersModel(), child: const Sonar()));
 
   doWhenWindowReady(() {
     const initialSize = Size(1280, 720);

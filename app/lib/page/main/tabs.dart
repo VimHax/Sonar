@@ -1,7 +1,7 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:app/main.dart';
 import 'package:app/page/main/account_dialog.dart';
-import 'package:app/page/main/member.dart';
+import 'package:app/page/main/members.dart';
 import 'package:app/util/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -127,21 +127,20 @@ class Tabs extends StatelessWidget {
                           side: MaterialStateProperty.all(BorderSide.none),
                           padding: MaterialStateProperty.all(
                               const EdgeInsets.all(0))),
-                      child: Consumer<MemberModel>(
-                        builder: (context, member, child) =>
-                            member.value == null
-                                ? const SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(),
-                                  )
-                                : CircleAvatar(
-                                    radius: 20,
-                                    backgroundColor: BrandColors.blackA,
-                                    backgroundImage: NetworkImage(
-                                      member.value!.avatar,
-                                    ),
-                                  ),
+                      child: Consumer<MembersModel>(
+                        builder: (context, members, child) => members.me == null
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(),
+                              )
+                            : CircleAvatar(
+                                radius: 20,
+                                backgroundColor: BrandColors.blackA,
+                                backgroundImage: NetworkImage(
+                                  members.me!.avatar,
+                                ),
+                              ),
                       )),
                 ),
               ))

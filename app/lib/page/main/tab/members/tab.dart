@@ -1,6 +1,6 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:app/main.dart';
-import 'package:app/page/main/members.dart';
+import 'package:app/models/members.dart';
 import 'package:app/page/main/tab/members/member.dart';
 import 'package:app/util/colors.dart';
 import 'package:flutter/material.dart';
@@ -54,25 +54,37 @@ class _MembersTabState extends State<MembersTab> {
                                 child: CircularProgressIndicator(),
                               ),
                             )
-                          : SingleChildScrollView(
-                              child: LayoutGrid(
-                                autoPlacement: AutoPlacement.rowSparse,
-                                gridFit: GridFit.loose,
-                                columnSizes: [1.fr, 1.fr],
-                                rowSizes: List.filled(
-                                    (members.all!.length / 2.0).ceil(), auto),
-                                columnGap: 10,
-                                rowGap: 10,
-                                children: members.all!
-                                    .map((e) => MemberRow(member: e))
-                                    .indexed
-                                    .map((e) => FadeIn(
-                                        delay:
-                                            Duration(milliseconds: 100 * e.$1),
-                                        child: e.$2))
-                                    .toList(),
-                              ),
-                            ),
+                          : members.all!.isEmpty
+                              ? Center(
+                                  child: Text("No members.",
+                                      style: GoogleFonts.montserrat(
+                                        textStyle: const TextStyle(
+                                            color: BrandColors.whiteA,
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.w600,
+                                            height: 0.9),
+                                      )),
+                                )
+                              : SingleChildScrollView(
+                                  child: LayoutGrid(
+                                    autoPlacement: AutoPlacement.rowSparse,
+                                    gridFit: GridFit.loose,
+                                    columnSizes: [1.fr, 1.fr],
+                                    rowSizes: List.filled(
+                                        (members.all!.length / 2.0).ceil(),
+                                        auto),
+                                    columnGap: 10,
+                                    rowGap: 10,
+                                    children: members.all!
+                                        .map((e) => MemberRow(member: e))
+                                        .indexed
+                                        .map((e) => FadeIn(
+                                            delay: Duration(
+                                                milliseconds: 100 * e.$1),
+                                            child: e.$2))
+                                        .toList(),
+                                  ),
+                                ),
                     )))
           ],
         ),

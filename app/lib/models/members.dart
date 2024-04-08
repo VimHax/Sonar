@@ -39,7 +39,7 @@ class MembersModel extends ChangeNotifier {
 
   Member? get me {
     if (_members == null) return null;
-    return _members!.firstWhere((e) => e.id == getMemberID());
+    return get(getMemberID());
   }
 
   MembersModel() {
@@ -50,6 +50,10 @@ class MembersModel extends ChangeNotifier {
         _startTracking();
       }
     });
+  }
+
+  Member get(String id) {
+    return _members!.firstWhere((e) => e.id == id);
   }
 
   void _startTracking() {

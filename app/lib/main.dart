@@ -1,8 +1,10 @@
 import 'dart:io';
 
+import 'package:app/models/intros.dart';
+import 'package:app/models/sounds.dart';
 import 'package:app/page/initial/page.dart';
 import 'package:app/page/login/page.dart';
-import 'package:app/page/main/members.dart';
+import 'package:app/models/members.dart';
 import 'package:app/page/main/page.dart';
 import 'package:app/util/background.dart';
 import 'package:app/util/colors.dart';
@@ -53,8 +55,11 @@ void main() async {
     anonKey: supabaseAnonKey,
   );
 
-  runApp(ChangeNotifierProvider(
-      create: (context) => MembersModel(), child: const Sonar()));
+  runApp(MultiProvider(providers: [
+    ChangeNotifierProvider(create: (context) => MembersModel()),
+    ChangeNotifierProvider(create: (context) => SoundsModel()),
+    ChangeNotifierProvider(create: (context) => IntrosModel())
+  ], child: const Sonar()));
 
   doWhenWindowReady(() {
     const initialSize = Size(1280, 720);

@@ -1,7 +1,7 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:app/main.dart';
 import 'package:app/page/main/account_dialog.dart';
-import 'package:app/page/main/members.dart';
+import 'package:app/models/members.dart';
 import 'package:app/util/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

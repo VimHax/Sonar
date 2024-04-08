@@ -1,9 +1,14 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:app/main.dart';
+import 'package:app/models/members.dart';
+import 'package:app/models/sounds.dart';
 import 'package:app/page/main/tab/sounds/add_sound_dialog.dart';
+import 'package:app/page/main/tab/sounds/sound.dart';
 import 'package:app/util/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 class SoundsTab extends StatefulWidget {
   const SoundsTab({super.key});
@@ -67,11 +72,50 @@ class _SoundsTabState extends State<SoundsTab> {
             Expanded(
                 child: FadeIn(
                     delay: const Duration(milliseconds: 600),
-                    child: Container(
-                        decoration: BoxDecoration(
-                            borderRadius: const BorderRadius.all(
-                                Radius.circular(borderRadius)),
-                            border: Border.all(color: BrandColors.whiteA)))))
+                    child: Consumer2<MembersModel, SoundsModel>(
+                      builder: (context, members, sounds, child) =>
+                          members.all == null || sounds.all == null
+                              ? const Center(
+                                  child: SizedBox(
+                                    width: 50,
+                                    height: 50,
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                )
+                              : sounds.all!.isEmpty
+                                  ? Center(
+                                      child: Text("No sounds.",
+                                          style: GoogleFonts.montserrat(
+                                            textStyle: const TextStyle(
+                                                color: BrandColors.whiteA,
+                                                fontSize: 22,
+                                                fontWeight: FontWeight.w600,
+                                                height: 0.9),
+                                          )),
+                                    )
+                                  : SingleChildScrollView(
+                                      child: LayoutGrid(
+                                        autoPlacement: AutoPlacement.rowSparse,
+                                        gridFit: GridFit.loose,
+                                        columnSizes: [1.fr],
+                                        rowSizes: List.filled(
+                                            (sounds.all!.length / 1.0).ceil(),
+                                            auto),
+                                        columnGap: 10,
+                                        rowGap: 10,
+                                        children: sounds.all!
+                                            .map((e) => SoundRow(
+                                                sound: e,
+                                                member: members.get(e.author)))
+                                            .indexed
+                                            .map((e) => FadeIn(
+                                                delay: Duration(
+                                                    milliseconds: 100 * e.$1),
+                                                child: e.$2))
+                                            .toList(),
+                                      ),
+                                    ),
+                    )))
           ],
         ),
       ),

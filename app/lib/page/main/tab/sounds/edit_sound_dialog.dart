@@ -4,6 +4,7 @@ import 'dart:ui';
 
 import 'package:animate_do/animate_do.dart';
 import 'package:app/main.dart';
+import 'package:app/models/sounds.dart';
 import 'package:app/util/edge_functions.dart';
 import 'package:app/util/colors.dart';
 import 'package:app/util/snackbar.dart';
@@ -12,14 +13,16 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:path/path.dart';
 
-class AddSoundDialog extends StatefulWidget {
-  const AddSoundDialog({super.key});
+class EditSoundDialog extends StatefulWidget {
+  const EditSoundDialog({super.key, required this.sound});
+
+  final Sound sound;
 
   @override
-  State<AddSoundDialog> createState() => _AddSoundDialogState();
+  State<EditSoundDialog> createState() => _EditSoundDialogState();
 }
 
-class _AddSoundDialogState extends State<AddSoundDialog> {
+class _EditSoundDialogState extends State<EditSoundDialog> {
   late final TextEditingController _name;
   late final TextEditingController _soundPath;
   Uint8List? _thumbnail;
@@ -28,8 +31,8 @@ class _AddSoundDialogState extends State<AddSoundDialog> {
 
   @override
   void initState() {
-    _name = TextEditingController();
-    _soundPath = TextEditingController();
+    _name = TextEditingController(text: widget.sound.name);
+    _soundPath = TextEditingController(text: "Ctrl + Shift + 1");
     super.initState();
   }
 
@@ -60,7 +63,7 @@ class _AddSoundDialogState extends State<AddSoundDialog> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text("Add Sound",
+                      Text("Edit Sound",
                           style: GoogleFonts.bebasNeue(
                             textStyle: const TextStyle(
                                 color: BrandColors.white,
@@ -82,19 +85,15 @@ class _AddSoundDialogState extends State<AddSoundDialog> {
                                       color: BrandColors.blackA,
                                       borderRadius:
                                           BorderRadius.circular(borderRadius),
-                                      image: _thumbnail == null
-                                          ? null
-                                          : DecorationImage(
-                                              fit: BoxFit.cover,
-                                              image: MemoryImage(_thumbnail!))),
-                                  child: _thumbnail != null
-                                      ? null
-                                      : const Center(
-                                          child: Icon(
-                                            Icons.add_sharp,
-                                            size: 50,
-                                          ),
-                                        ),
+                                      image: DecorationImage(
+                                          fit: BoxFit.cover,
+                                          image: _thumbnail == null
+                                              ? NetworkImage(supabase.storage
+                                                      .from("thumbnail")
+                                                      .getPublicUrl(
+                                                          "${widget.sound.author}/${widget.sound.thumbnail}"))
+                                                  as ImageProvider
+                                              : MemoryImage(_thumbnail!))),
                                 ),
                                 TextButton(
                                   style: ButtonStyle(
@@ -147,7 +146,7 @@ class _AddSoundDialogState extends State<AddSoundDialog> {
                                           style: const TextStyle(
                                               color: BrandColors.white),
                                           decoration: const InputDecoration(
-                                              labelText: "Sound",
+                                              labelText: "Shortcut",
                                               labelStyle: TextStyle(
                                                   color: BrandColors.white),
                                               disabledBorder:
@@ -257,7 +256,7 @@ class _AddSoundDialogState extends State<AddSoundDialog> {
                                               child:
                                                   CircularProgressIndicator(),
                                             )
-                                          : Text("Upload".toUpperCase(),
+                                          : Text("Edit".toUpperCase(),
                                               style: GoogleFonts.montserrat(
                                                   textStyle: const TextStyle(
                                                       fontSize: 14,

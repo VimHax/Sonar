@@ -1,4 +1,4 @@
-import 'package:app/page/main/members.dart';
+import 'package:app/models/members.dart';
 import 'package:app/page/main/tab/members/member_dialog.dart';
 import 'package:app/util/colors.dart';
 import 'package:flutter/material.dart';
@@ -43,7 +43,7 @@ class _MemberRowState extends State<MemberRow> {
                   ),
                 ),
                 const SizedBox(
-                  width: 5,
+                  width: 0,
                 ),
                 Center(
                   child: Container(
@@ -53,7 +53,7 @@ class _MemberRowState extends State<MemberRow> {
                   ),
                 ),
                 const SizedBox(
-                  width: 20,
+                  width: 15,
                 ),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -83,7 +83,10 @@ class _MemberRowState extends State<MemberRow> {
                                     fontSize: 22,
                                     fontWeight: FontWeight.w600,
                                     height: 0.9),
-                              ))
+                              )),
+                          const SizedBox(
+                            height: 4,
+                          )
                         ],
                 )
               ],

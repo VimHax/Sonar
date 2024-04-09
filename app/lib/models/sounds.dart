@@ -3,9 +3,11 @@
 import 'dart:async';
 
 import 'package:app/main.dart';
+import 'package:app/util/id.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 part 'sounds.g.dart';
 
@@ -30,6 +32,7 @@ class Sound {
 class SoundsModel extends ChangeNotifier {
   List<Sound>? _sounds;
   StreamSubscription? _sub;
+  RealtimeChannel? _channel;
 
   UnmodifiableListView<Sound>? get all =>
       _sounds == null ? null : UnmodifiableListView(_sounds!);
@@ -48,18 +51,45 @@ class SoundsModel extends ChangeNotifier {
     return _sounds!.firstWhereOrNull((e) => e.id == id);
   }
 
+  void play(String id) {
+    _channel!.sendBroadcastMessage(
+        event: "play", payload: {'sound': id, 'member': getMemberID()});
+  }
+
   void _startTracking() {
     _sub = supabase.from("sounds").stream(primaryKey: ['id']).listen((event) {
       _sounds = [];
       _sounds!.addAll(event.map((e) => Sound.fromJson(e)));
       notifyListeners();
     });
+    _channel = supabase
+        .channel("soundboard")
+        .onBroadcast(
+            event: 'playing',
+            callback: (payload) {
+              print('Play received: $payload');
+            })
+        .onBroadcast(
+            event: 'error',
+            callback: (payload) {
+              print('Play received: $payload');
+            })
+        .onBroadcast(
+            event: 'completed',
+            callback: (payload) {
+              print('Complete received: $payload');
+            })
+        .subscribe();
   }
 
   void _stopTracking() {
     _sounds = null;
     _sub?.cancel();
     _sub = null;
+    if (_channel != null) {
+      supabase.removeChannel(_channel!);
+      _channel = null;
+    }
     notifyListeners();
   }
 }

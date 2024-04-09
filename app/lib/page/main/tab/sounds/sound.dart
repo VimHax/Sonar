@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:app/main.dart';
 import 'package:app/models/members.dart';
 import 'package:app/models/sounds.dart';
 import 'package:app/page/main/tab/members/member_dialog.dart';

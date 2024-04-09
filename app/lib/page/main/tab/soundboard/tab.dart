@@ -1,8 +1,12 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:app/main.dart';
+import 'package:app/models/sounds.dart';
+import 'package:app/page/main/tab/soundboard/sound.dart';
 import 'package:app/util/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 class SoundboardTab extends StatefulWidget {
   const SoundboardTab({super.key});
@@ -25,47 +29,68 @@ class _SoundboardTabState extends State<SoundboardTab> {
           children: [
             SizedBox(
               height: 73,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  FadeIn(
-                      delay: const Duration(milliseconds: 200),
-                      child: Text("Soundboard",
-                          style: GoogleFonts.bebasNeue(
-                            textStyle: const TextStyle(
-                                color: BrandColors.white,
-                                fontSize: 100,
-                                height: 0.84),
-                          ))),
-                  FadeIn(
-                      delay: const Duration(milliseconds: 400),
-                      child: AspectRatio(
-                        aspectRatio: 1,
-                        child: TextButton(
-                            onPressed: () {},
-                            style: ButtonStyle(
-                                padding: MaterialStateProperty.all(
-                                    const EdgeInsets.all(0))),
-                            child: const Icon(
-                              Icons.add_sharp,
-                              size: 35,
-                            )),
-                      )),
-                ],
-              ),
+              child: FadeIn(
+                  delay: const Duration(milliseconds: 200),
+                  child: Text("Soundboard",
+                      style: GoogleFonts.bebasNeue(
+                        textStyle: const TextStyle(
+                            color: BrandColors.white,
+                            fontSize: 100,
+                            height: 0.84),
+                      ))),
             ),
             const SizedBox(
               height: 20,
             ),
             Expanded(
                 child: FadeIn(
-                    delay: const Duration(milliseconds: 600),
-                    child: Container(
-                        decoration: BoxDecoration(
-                            borderRadius: const BorderRadius.all(
-                                Radius.circular(borderRadius)),
-                            border: Border.all(color: BrandColors.whiteA)))))
+                    delay: const Duration(milliseconds: 400),
+                    child: Consumer<SoundsModel>(
+                      builder: (context, sounds, child) => sounds.all == null
+                          ? const Center(
+                              child: SizedBox(
+                                width: 50,
+                                height: 50,
+                                child: CircularProgressIndicator(),
+                              ),
+                            )
+                          : sounds.all!.isEmpty
+                              ? Center(
+                                  child: Text("No sounds.",
+                                      style: GoogleFonts.montserrat(
+                                        textStyle: const TextStyle(
+                                            color: BrandColors.whiteA,
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.w600,
+                                            height: 0.9),
+                                      )),
+                                )
+                              : SingleChildScrollView(
+                                  child: LayoutGrid(
+                                    autoPlacement: AutoPlacement.rowSparse,
+                                    gridFit: GridFit.loose,
+                                    columnSizes: List.filled(5, 1.fr),
+                                    rowSizes: List.filled(
+                                        (sounds.all!.length / 1.0).ceil(),
+                                        auto),
+                                    columnGap: 10,
+                                    rowGap: 10,
+                                    children: sounds.all!
+                                        .map((e) => SoundButton(
+                                              sound: e,
+                                              onPressed: () {
+                                                sounds.play(e.id);
+                                              },
+                                            ))
+                                        .indexed
+                                        .map((e) => FadeIn(
+                                            delay: Duration(
+                                                milliseconds: 100 * e.$1),
+                                            child: e.$2))
+                                        .toList(),
+                                  ),
+                                ),
+                    )))
           ],
         ),
       ),

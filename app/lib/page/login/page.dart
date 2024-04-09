@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:animate_do/animate_do.dart';
 import 'package:app/main.dart';
@@ -82,12 +81,10 @@ class _LoginPageState extends State<LoginPage> {
                                     _loading = true;
                                   });
                                   try {
-                                    stdout.writeln("Signing In!");
                                     await supabase.auth.signInWithOAuth(
                                         OAuthProvider.discord,
                                         redirectTo:
                                             'https://sonar-xi.vercel.app/');
-                                    stdout.writeln("Signed In!");
                                   } catch (e) {
                                     setState(() {
                                       _loading = false;

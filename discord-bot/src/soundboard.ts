@@ -5,6 +5,12 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import { Sound } from './types';
 import { assert, humanFileSize } from './util';
 import { performance } from 'perf_hooks';
+import {
+	createAudioPlayer,
+	createAudioResource,
+	StreamType,
+	VoiceConnection
+} from '@discordjs/voice';
 
 const FFMPEG_PCM_ARGUMENTS = [
 	'-analyzeduration',
@@ -36,16 +42,25 @@ const WRITE_AHEAD = 5;
 
 export default class Soundboard {
 	private readonly _sounds = new Map<string, { name: string; buffer: Buffer }>();
-	public readonly stream = new PassThrough();
-	public _playing: { start: number | null; buffer: Buffer }[] = [];
+	private readonly _stream = new PassThrough();
+	private readonly _player = createAudioPlayer();
+	private _playerPaused = true;
+	private _playing: { start: number | null; buffer: Buffer }[] = [];
 	private _start: number | null = null;
 	private _cursor: number = 0;
 	private _paused: number | null = null;
 	private _pausedTime: number = 0;
 
 	public constructor(private readonly _supabase: SupabaseClient) {
+		const resource = createAudioResource(this._stream, { inputType: StreamType.Raw });
+		this._player.play(resource);
+
 		this._tick();
-		this.stream.on('drain', () => this._tick());
+		this._stream.on('drain', () => this._tick());
+	}
+
+	public subscribe(connection: VoiceConnection) {
+		connection.subscribe(this._player);
 	}
 
 	public async addSound(sound: Sound): Promise<void> {
@@ -92,32 +107,37 @@ export default class Soundboard {
 		const currentChunks = Math.floor((currentTime - this._start) / CHUNK_DURATION);
 
 		if (this._paused !== null) {
-			// currentTime - this._paused
 			this._cursor = currentChunks;
 			this._paused = null;
 		}
 
-		// console.log('x');
 		while (this._cursor - currentChunks < WRITE_AHEAD) {
-			// console.log(this._cursor, currentChunks);
-
 			this._playing = this._playing.filter((x) => {
 				if (x.start === null) return true;
 				const chunks = Math.ceil(x.buffer.byteLength / CHUNK_SIZE);
 				return this._cursor - x.start <= chunks;
 			});
-			// console.log('x');
 
-			// if (this._playing.length === 0) {
-			// 	this._cursor++;
-			// 	continue;
-			// }
+			if (this._playing.length === 0) {
+				if (!this._playerPaused) {
+					console.log('Pause!');
+					this._playerPaused = true;
+					this._player.pause();
+				}
+				this._cursor++;
+				continue;
+			} else {
+				if (this._playerPaused) {
+					this._playerPaused = false;
+					console.log('Play!');
+					this._player.unpause();
+				}
+			}
 
 			// This technically isn't correct as partial chunks are not properly considered
 			const chunk = Buffer.alloc(CHUNK_SIZE);
 			const factor = 1 / Math.sqrt(this._playing.length);
 			for (const x of this._playing) {
-				console.log(this._cursor, currentChunks);
 				if (x.start === null) x.start = this._cursor;
 				const startByte = (this._cursor - x.start) * CHUNK_SIZE;
 				const sub = x.buffer.subarray(startByte, startByte + CHUNK_SIZE);
@@ -127,7 +147,7 @@ export default class Soundboard {
 				}
 			}
 
-			const res = this.stream.write(chunk);
+			const res = this._stream.write(chunk);
 			this._cursor++;
 			if (!res) {
 				this._paused = performance.now();

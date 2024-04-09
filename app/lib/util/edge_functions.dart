@@ -59,3 +59,20 @@ Future<FunctionResponse> addSound(
         contentType: MediaType.parse("audio/*"), filename: 'audio')
   ]);
 }
+
+Future<FunctionResponse> editSound(
+    {required String id, String? name, Uint8List? thumbnail}) {
+  if (name == null && thumbnail == null) {
+    throw Exception('Both name and thumbnail cannot be simultaneously null.');
+  }
+  return _invoke(
+      functionName: "edit-sound",
+      fields: name == null ? {'id': id} : {'id': id, 'name': name},
+      files: thumbnail == null
+          ? []
+          : [
+              http.MultipartFile.fromBytes("thumbnail", thumbnail,
+                  contentType: MediaType.parse("image/*"),
+                  filename: 'thumbnail'),
+            ]);
+}

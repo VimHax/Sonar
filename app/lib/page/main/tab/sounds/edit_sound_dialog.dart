@@ -25,15 +25,15 @@ class EditSoundDialog extends StatefulWidget {
 
 class _EditSoundDialogState extends State<EditSoundDialog> {
   late final TextEditingController _name;
-  late final TextEditingController _soundPath;
+  late final TextEditingController _shortcut;
   Uint8List? _thumbnail;
-  Uint8List? _sound;
-  bool _loading = false;
+  bool _loadingEdit = false;
+  bool _loadingDelete = false;
 
   @override
   void initState() {
     _name = TextEditingController(text: widget.sound.name);
-    _soundPath = TextEditingController(text: "Ctrl + Shift + 1");
+    _shortcut = TextEditingController(text: "Ctrl + Shift + 1");
     super.initState();
   }
 
@@ -43,7 +43,7 @@ class _EditSoundDialogState extends State<EditSoundDialog> {
       children: [
         GestureDetector(
           onTap: () {
-            if (!_loading) Navigator.pop(context);
+            if (!_loadingEdit && !_loadingDelete) Navigator.pop(context);
           },
         ),
         ClipRect(
@@ -141,7 +141,7 @@ class _EditSoundDialogState extends State<EditSoundDialog> {
                                       Expanded(
                                         child: TextField(
                                           enabled: false,
-                                          controller: _soundPath,
+                                          controller: _shortcut,
                                           style: const TextStyle(
                                               color: BrandColors.white),
                                           decoration: const InputDecoration(
@@ -162,20 +162,7 @@ class _EditSoundDialogState extends State<EditSoundDialog> {
                                       AspectRatio(
                                         aspectRatio: 1,
                                         child: TextButton(
-                                            onPressed: () async {
-                                              FilePickerResult? result =
-                                                  await FilePicker.platform
-                                                      .pickFiles(
-                                                          type: FileType.audio);
-                                              if (result == null) return;
-                                              File file = File(
-                                                  result.files.single.path!);
-                                              var data =
-                                                  await file.readAsBytes();
-                                              _soundPath.text =
-                                                  basename(file.path);
-                                              setState(() => _sound = data);
-                                            },
+                                            onPressed: () async {},
                                             style: ButtonStyle(
                                               shape: MaterialStateProperty.all(
                                                   const RoundedRectangleBorder(
@@ -194,8 +181,8 @@ class _EditSoundDialogState extends State<EditSoundDialog> {
                                                       const EdgeInsets.all(0)),
                                             ),
                                             child: const Icon(
-                                              Icons.add_sharp,
-                                              size: 25,
+                                              Icons.circle_sharp,
+                                              size: 15,
                                             )),
                                       )
                                     ],
@@ -206,62 +193,155 @@ class _EditSoundDialogState extends State<EditSoundDialog> {
                                 ),
                                 SizedBox(
                                   height: 48,
-                                  child: TextButton(
-                                      onPressed: _name.value.text.isEmpty ||
-                                              _thumbnail == null ||
-                                              _sound == null ||
-                                              _loading
-                                          ? null
-                                          : () async {
-                                              setState(() {
-                                                _loading = true;
-                                              });
-                                              try {
-                                                var res = await addSound(
-                                                    name: _name.value.text,
-                                                    thumbnail: _thumbnail!,
-                                                    audio: _sound!);
-                                                setState(() {
-                                                  _loading = false;
-                                                });
-                                                if (context.mounted) {
-                                                  if (res.status == 200) {
-                                                    showSuccessSnackBar(context,
-                                                        'Successfully added sound.');
-                                                    Navigator.pop(context);
-                                                  } else {
-                                                    showErrorSnackBar(context,
-                                                        'An error occurred when adding the sound.');
-                                                  }
-                                                }
-                                              } catch (e) {
-                                                setState(() {
-                                                  _loading = false;
-                                                });
-                                                if (context.mounted) {
-                                                  showErrorSnackBar(context,
-                                                      'An error occurred when adding the sound.');
-                                                }
-                                              }
-                                            },
-                                      style: ButtonStyle(
-                                        padding: MaterialStateProperty.all(
-                                            const EdgeInsets.all(0)),
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: [
+                                      Expanded(
+                                        child: TextButton(
+                                            onPressed: (_name.value.text ==
+                                                            widget.sound.name &&
+                                                        _thumbnail == null) ||
+                                                    _loadingEdit ||
+                                                    _loadingDelete
+                                                ? null
+                                                : () async {
+                                                    setState(() {
+                                                      _loadingEdit = true;
+                                                    });
+                                                    try {
+                                                      var res = await editSound(
+                                                        id: widget.sound.id,
+                                                        name: _name.value
+                                                                    .text ==
+                                                                widget
+                                                                    .sound.name
+                                                            ? null
+                                                            : _name.value.text,
+                                                        thumbnail: _thumbnail,
+                                                      );
+                                                      setState(() {
+                                                        _loadingEdit = false;
+                                                      });
+                                                      if (context.mounted) {
+                                                        if (res.status == 200) {
+                                                          showSuccessSnackBar(
+                                                              context,
+                                                              'Successfully edited sound.');
+                                                          Navigator.pop(
+                                                              context);
+                                                        } else {
+                                                          showErrorSnackBar(
+                                                              context,
+                                                              'An error occurred when editing the sound.');
+                                                        }
+                                                      }
+                                                    } catch (e) {
+                                                      setState(() {
+                                                        _loadingEdit = false;
+                                                      });
+                                                      if (context.mounted) {
+                                                        showErrorSnackBar(
+                                                            context,
+                                                            'An error occurred when editing the sound.');
+                                                      }
+                                                    }
+                                                  },
+                                            style: ButtonStyle(
+                                              padding:
+                                                  MaterialStateProperty.all(
+                                                      const EdgeInsets.all(0)),
+                                            ),
+                                            child: _loadingEdit
+                                                ? const SizedBox(
+                                                    width: 20,
+                                                    height: 20,
+                                                    child:
+                                                        CircularProgressIndicator(),
+                                                  )
+                                                : Text("Edit".toUpperCase(),
+                                                    style: GoogleFonts.montserrat(
+                                                        textStyle:
+                                                            const TextStyle(
+                                                                fontSize: 14,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                                letterSpacing:
+                                                                    2)))),
                                       ),
-                                      child: _loading
-                                          ? const SizedBox(
-                                              width: 20,
-                                              height: 20,
-                                              child:
-                                                  CircularProgressIndicator(),
-                                            )
-                                          : Text("Edit".toUpperCase(),
-                                              style: GoogleFonts.montserrat(
-                                                  textStyle: const TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      letterSpacing: 2)))),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      Expanded(
+                                        child: TextButton(
+                                            onPressed: _loadingEdit
+                                                ? null
+                                                : () async {
+                                                    setState(() {
+                                                      _loadingDelete = true;
+                                                    });
+                                                    try {
+                                                      var res = await supabase
+                                                          .functions
+                                                          .invoke(
+                                                              'delete-sound',
+                                                              body: {
+                                                            'id':
+                                                                widget.sound.id
+                                                          });
+                                                      setState(() {
+                                                        _loadingDelete = false;
+                                                      });
+                                                      if (context.mounted) {
+                                                        if (res.status == 200) {
+                                                          showSuccessSnackBar(
+                                                              context,
+                                                              'Successfully deleted sound.');
+                                                          Navigator.pop(
+                                                              context);
+                                                        } else {
+                                                          showErrorSnackBar(
+                                                              context,
+                                                              'An error occurred when deleting the sound.');
+                                                        }
+                                                      }
+                                                    } catch (e) {
+                                                      setState(() {
+                                                        _loadingDelete = false;
+                                                      });
+                                                      if (context.mounted) {
+                                                        showErrorSnackBar(
+                                                            context,
+                                                            'An error occurred when deleting the sound.');
+                                                      }
+                                                    }
+                                                  },
+                                            style: ButtonStyle(
+                                              padding:
+                                                  MaterialStateProperty.all(
+                                                      const EdgeInsets.all(0)),
+                                            ),
+                                            child: _loadingDelete
+                                                ? const SizedBox(
+                                                    width: 20,
+                                                    height: 20,
+                                                    child:
+                                                        CircularProgressIndicator(),
+                                                  )
+                                                : Text("Delete".toUpperCase(),
+                                                    style: GoogleFonts.montserrat(
+                                                        textStyle:
+                                                            const TextStyle(
+                                                                fontSize: 14,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                                letterSpacing:
+                                                                    2)))),
+                                      ),
+                                    ],
+                                  ),
                                 )
                               ],
                             ),

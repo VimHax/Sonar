@@ -71,7 +71,5 @@ serve(async (req) => {
         throw res.error;
     }
 
-    const response = "Success.";
-
-    return createResponse(response, HTTPStatus.Ok);
+    return createResponse("Success.", HTTPStatus.Ok);
 });

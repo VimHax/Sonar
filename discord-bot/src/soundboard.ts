@@ -45,7 +45,7 @@ export default class Soundboard {
 	private readonly _stream = new PassThrough();
 	private readonly _player = createAudioPlayer();
 	private _playerPaused = true;
-	private _playing: { start: number | null; buffer: Buffer }[] = [];
+	private _playing: { name: string; start: number | null; buffer: Buffer }[] = [];
 	private _start: number | null = null;
 	private _cursor: number = 0;
 	private _paused: number | null = null;
@@ -80,7 +80,8 @@ export default class Soundboard {
 	public play(id: string): boolean {
 		const sound = this._sounds.get(id);
 		if (sound === undefined) return false;
-		this._playing.push({ start: null, buffer: sound.buffer });
+		this._playing.push({ name: sound.name, start: null, buffer: sound.buffer });
+		console.log(`[Soundboard] Playing sound "${sound.name}"...`);
 		return true;
 	}
 
@@ -107,6 +108,7 @@ export default class Soundboard {
 		const currentChunks = Math.floor((currentTime - this._start) / CHUNK_DURATION);
 
 		if (this._paused !== null) {
+			console.log('[Soundboard] Stream unpaused!');
 			this._cursor = currentChunks;
 			this._paused = null;
 		}
@@ -115,12 +117,16 @@ export default class Soundboard {
 			this._playing = this._playing.filter((x) => {
 				if (x.start === null) return true;
 				const chunks = Math.ceil(x.buffer.byteLength / CHUNK_SIZE);
-				return this._cursor - x.start <= chunks;
+				const stillPlaying = this._cursor - x.start <= chunks;
+				if (!stillPlaying) {
+					console.log(`[Soundboard] Completed sound "${x.name}"...`);
+				}
+				return stillPlaying;
 			});
 
 			if (this._playing.length === 0) {
 				if (!this._playerPaused) {
-					console.log('Pause!');
+					console.log('[Soundboard] Paused player!');
 					this._playerPaused = true;
 					this._player.pause();
 				}
@@ -129,7 +135,7 @@ export default class Soundboard {
 			} else {
 				if (this._playerPaused) {
 					this._playerPaused = false;
-					console.log('Play!');
+					console.log('[Soundboard] Unpause player!');
 					this._player.unpause();
 				}
 			}
@@ -150,6 +156,7 @@ export default class Soundboard {
 			const res = this._stream.write(chunk);
 			this._cursor++;
 			if (!res) {
+				console.log('[Soundboard] Stream paused!');
 				this._paused = performance.now();
 				return;
 			}

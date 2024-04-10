@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:app/models/hotkeys.dart';
 import 'package:app/models/members.dart';
 import 'package:app/models/sounds.dart';
 import 'package:app/page/main/tab/members/member_dialog.dart';
@@ -9,17 +10,15 @@ import 'package:app/util/colors.dart';
 import 'package:app/util/storage.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hotkey_manager/hotkey_manager.dart';
+import 'package:provider/provider.dart';
 
 enum SoundState { none, loading, playing }
 
 class SoundRow extends StatefulWidget {
-  const SoundRow({super.key, required this.sound, required this.member});
+  const SoundRow({super.key, required this.sound});
 
   final Sound sound;
-  final Member member;
 
   @override
   State<SoundRow> createState() => _SoundRowState();
@@ -121,12 +120,21 @@ class _SoundRowState extends State<SoundRow> {
                 const SizedBox(
                   width: 15,
                 ),
-                HotKeyView(
-                    hotKey: HotKey(
-                  key: PhysicalKeyboardKey.keyA,
-                  modifiers: [HotKeyModifier.control, HotKeyModifier.shift],
-                  scope: HotKeyScope.system,
-                ))
+                Consumer<HotKeysModel>(
+                  builder: (context, hotKeys, child) => hotKeys.all == null
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(),
+                        )
+                      : hotKeys.get(widget.sound.id) == null
+                          ? Text("None",
+                              style: GoogleFonts.montserrat(
+                                textStyle: const TextStyle(
+                                    color: BrandColors.white, fontSize: 16),
+                              ))
+                          : HotKeyView(hotKey: hotKeys.get(widget.sound.id)!),
+                )
               ],
             ),
             Row(
@@ -139,38 +147,51 @@ class _SoundRowState extends State<SoundRow> {
                 const SizedBox(
                   width: 15,
                 ),
-                TextButton(
-                    style: ButtonStyle(
-                        shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(36),
-                        )),
-                        padding: MaterialStateProperty.all(
-                            const EdgeInsets.fromLTRB(4, 11, 15, 11))),
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) =>
-                            MemberDialog(member: widget.member),
-                      );
-                    },
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        CircleAvatar(
-                          radius: 15,
-                          backgroundImage: NetworkImage(widget.member.avatar),
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        Text(
-                            widget.member.global_name ?? widget.member.username,
-                            style: GoogleFonts.montserrat(
-                              textStyle: const TextStyle(
-                                  color: BrandColors.white, fontSize: 14),
-                            ))
-                      ],
-                    ))
+                Consumer<MembersModel>(
+                  builder: (context, members, child) => members.all == null
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(),
+                        )
+                      : TextButton(
+                          style: ButtonStyle(
+                              shape: MaterialStateProperty.all(
+                                  RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(36),
+                              )),
+                              padding: MaterialStateProperty.all(
+                                  const EdgeInsets.fromLTRB(4, 11, 15, 11))),
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) => MemberDialog(
+                                  member: members.get(widget.sound.author)),
+                            );
+                          },
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              CircleAvatar(
+                                radius: 15,
+                                backgroundImage: NetworkImage(
+                                    members.get(widget.sound.author).avatar),
+                              ),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              Text(
+                                  members
+                                          .get(widget.sound.author)
+                                          .global_name ??
+                                      members.get(widget.sound.author).username,
+                                  style: GoogleFonts.montserrat(
+                                    textStyle: const TextStyle(
+                                        color: BrandColors.white, fontSize: 14),
+                                  ))
+                            ],
+                          )),
+                )
               ],
             ),
             Row(

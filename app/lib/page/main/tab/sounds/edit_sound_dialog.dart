@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:animate_do/animate_do.dart';
 import 'package:app/main.dart';
+import 'package:app/models/hotkeys.dart';
 import 'package:app/models/sounds.dart';
 import 'package:app/page/main/tab/sounds/hotkey_view.dart';
 import 'package:app/util/edge_functions.dart';
@@ -14,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hotkey_manager/hotkey_manager.dart';
+import 'package:provider/provider.dart';
 
 class EditSoundDialog extends StatefulWidget {
   const EditSoundDialog({super.key, required this.sound});
@@ -27,14 +29,20 @@ class EditSoundDialog extends StatefulWidget {
 class _EditSoundDialogState extends State<EditSoundDialog> {
   late final TextEditingController _name;
   late final TextEditingController _shortcut;
+  late final HotKeysModel _hotKeysProvider;
   HotKey? _hotKey;
   Uint8List? _thumbnail;
+  bool _hotKeys = false;
+  bool _updatedHotKey = false;
   bool _recording = false;
   bool _loadingEdit = false;
   bool _loadingDelete = false;
 
   @override
   void initState() {
+    _hotKeysProvider = context.read<HotKeysModel>();
+    _hotKeysProvider.addListener(_onHotKeysUpdate);
+    _onHotKeysUpdate();
     _name = TextEditingController(text: widget.sound.name);
     _shortcut = TextEditingController(text: "");
     HardwareKeyboard.instance.addHandler(_handleKeyEvent);
@@ -44,7 +52,16 @@ class _EditSoundDialogState extends State<EditSoundDialog> {
   @override
   void dispose() {
     HardwareKeyboard.instance.removeHandler(_handleKeyEvent);
+    _hotKeysProvider.removeListener(_onHotKeysUpdate);
     super.dispose();
+  }
+
+  void _onHotKeysUpdate() {
+    setState(() {
+      _hotKeys = _hotKeysProvider.all != null;
+      if (!_hotKeys) return;
+      _hotKey = _hotKeysProvider.get(widget.sound.id);
+    });
   }
 
   bool _handleKeyEvent(KeyEvent keyEvent) {
@@ -56,6 +73,7 @@ class _EditSoundDialogState extends State<EditSoundDialog> {
       setState(() {
         _hotKey = null;
         _recording = false;
+        _updatedHotKey = true;
       });
       return true;
     }
@@ -74,7 +92,10 @@ class _EditSoundDialogState extends State<EditSoundDialog> {
     );
 
     if (!HotKeyModifier.values.any((e) => e.physicalKeys.contains(key))) {
-      setState(() => _recording = false);
+      setState(() {
+        _recording = false;
+        _updatedHotKey = true;
+      });
     } else {
       setState(() {});
     }
@@ -177,12 +198,6 @@ class _EditSoundDialogState extends State<EditSoundDialog> {
                                 const SizedBox(
                                   height: 15,
                                 ),
-                                // HotKeyRecorder(
-                                //   onHotKeyRecorded: (hotKey) {
-                                //     // _hotKey = hotKey;
-                                //     print(hotKey);
-                                //   },
-                                // ),
                                 SizedBox(
                                   height: 48,
                                   child: Row(
@@ -198,10 +213,13 @@ class _EditSoundDialogState extends State<EditSoundDialog> {
                                               style: const TextStyle(
                                                   color: BrandColors.white),
                                               decoration: InputDecoration(
-                                                  hintText: _recording ||
+                                                  hintText: !_hotKeys ||
                                                           _hotKey != null
                                                       ? null
-                                                      : "Record Shortcut",
+                                                      : _recording &&
+                                                              _hotKey == null
+                                                          ? "Recording..."
+                                                          : "Record Shortcut",
                                                   labelStyle: const TextStyle(
                                                       color: BrandColors.white),
                                                   disabledBorder:
@@ -224,6 +242,17 @@ class _EditSoundDialogState extends State<EditSoundDialog> {
                                                             11),
                                                     child: HotKeyView(
                                                         hotKey: _hotKey!),
+                                                  ),
+                                            _hotKeys
+                                                ? Container()
+                                                : const Padding(
+                                                    padding: EdgeInsets.all(14),
+                                                    child: SizedBox(
+                                                      width: 20,
+                                                      height: 20,
+                                                      child:
+                                                          CircularProgressIndicator(),
+                                                    ),
                                                   )
                                           ],
                                         ),
@@ -231,7 +260,7 @@ class _EditSoundDialogState extends State<EditSoundDialog> {
                                       AspectRatio(
                                         aspectRatio: 1,
                                         child: TextButton(
-                                            onPressed: _recording
+                                            onPressed: !_hotKeys || _recording
                                                 ? null
                                                 : () {
                                                     setState(() {
@@ -277,14 +306,33 @@ class _EditSoundDialogState extends State<EditSoundDialog> {
                                         child: TextButton(
                                             onPressed: (_name.value.text ==
                                                             widget.sound.name &&
-                                                        _thumbnail == null) ||
+                                                        _thumbnail == null &&
+                                                        !_updatedHotKey) ||
                                                     _loadingEdit ||
-                                                    _loadingDelete
+                                                    _loadingDelete ||
+                                                    _recording
                                                 ? null
                                                 : () async {
                                                     setState(() {
                                                       _loadingEdit = true;
                                                     });
+                                                    if (_updatedHotKey) {
+                                                      _hotKeysProvider.set(
+                                                          widget.sound.id,
+                                                          _hotKey);
+                                                    }
+                                                    if (_name.value.text ==
+                                                            widget.sound.name &&
+                                                        _thumbnail == null) {
+                                                      setState(() {
+                                                        _loadingEdit = false;
+                                                      });
+                                                      showSuccessSnackBar(
+                                                          context,
+                                                          'Successfully edited sound.');
+                                                      Navigator.pop(context);
+                                                      return;
+                                                    }
                                                     try {
                                                       var res = await editSound(
                                                         id: widget.sound.id,
@@ -351,12 +399,16 @@ class _EditSoundDialogState extends State<EditSoundDialog> {
                                       ),
                                       Expanded(
                                         child: TextButton(
-                                            onPressed: _loadingEdit
+                                            onPressed: _loadingEdit ||
+                                                    _loadingDelete ||
+                                                    _recording
                                                 ? null
                                                 : () async {
                                                     setState(() {
                                                       _loadingDelete = true;
                                                     });
+                                                    _hotKeysProvider.set(
+                                                        widget.sound.id, null);
                                                     try {
                                                       var res = await supabase
                                                           .functions

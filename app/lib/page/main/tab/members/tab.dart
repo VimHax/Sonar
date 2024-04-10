@@ -8,14 +8,9 @@ import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-class MembersTab extends StatefulWidget {
+class MembersTab extends StatelessWidget {
   const MembersTab({super.key});
 
-  @override
-  State<MembersTab> createState() => _MembersTabState();
-}
-
-class _MembersTabState extends State<MembersTab> {
   @override
   Widget build(BuildContext context) {
     return FadeIn(

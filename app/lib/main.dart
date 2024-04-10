@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:app/models/hotkeys.dart';
 import 'package:app/models/intros.dart';
 import 'package:app/models/sounds.dart';
 import 'package:app/page/initial/page.dart';
@@ -60,7 +61,8 @@ void main() async {
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (context) => MembersModel()),
     ChangeNotifierProvider(create: (context) => SoundsModel()),
-    ChangeNotifierProvider(create: (context) => IntrosModel())
+    ChangeNotifierProvider(create: (context) => IntrosModel()),
+    ChangeNotifierProvider(create: (context) => HotKeysModel())
   ], child: const Sonar()));
 
   doWhenWindowReady(() {

@@ -1,7 +1,7 @@
 import { User } from 'discord.js';
 import { Member } from './types';
 
-export function transform(user: User): Omit<Member, 'created_at'> {
+export function transformUser(user: User): Omit<Member, 'created_at'> {
 	return {
 		id: user.id,
 		username: user.username,

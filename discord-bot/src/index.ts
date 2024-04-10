@@ -1,11 +1,11 @@
 import * as dotenv from 'dotenv';
-import { Client, GatewayIntentBits } from 'discord.js';
+import { Client, GatewayIntentBits, channelLink } from 'discord.js';
 import { createClient } from '@supabase/supabase-js';
-import { assert, transform } from './util';
+import { assert, transformUser } from './util';
 import { Intro, Sound } from './types';
 import { z } from 'zod';
-import { joinVoiceChannel } from '@discordjs/voice';
 import Soundboard from './soundboard';
+import { getVoiceConnection } from '@discordjs/voice';
 
 dotenv.config();
 
@@ -30,67 +30,13 @@ const client = new Client({
 	]
 });
 
-const soundboard = new Soundboard(supabase);
-let sounds: Map<string, Sound> | null = null;
-let intros: Map<string, Intro> | null = null;
+let loaded = false;
+let soundboard: Soundboard | null = null;
+let intros: Map<string, string> | null = null;
 const lastDisconnect = new Map<string, number>();
 
-supabase
-	.from('sounds')
-	.select('*')
-	.then(async (res) => {
-		if (res.error) throw res.error;
-		sounds = new Map(
-			z
-				.array(Sound)
-				.parse(res.data)
-				.map((x) => {
-					soundboard.addSound(x);
-					return [x.id, x];
-				})
-		);
-		console.log('Received all sounds! Count:', sounds.size);
-	});
-
-supabase
-	.from('intros')
-	.select('*')
-	.then((res) => {
-		if (res.error) throw res.error;
-		intros = new Map(
-			z
-				.array(Intro)
-				.parse(res.data)
-				.map((x) => [x.id, x])
-		);
-		console.log('Received all intros! Count:', intros.size);
-	});
-
-supabase
-	.channel('table-db-changes')
-	.on(
-		'postgres_changes',
-		{
-			event: 'INSERT',
-			schema: 'public',
-			table: 'sounds'
-		},
-		(payload) => console.log(payload)
-	)
-	.subscribe();
-
-supabase
-	.channel('soundboard')
-	.on('broadcast', { event: 'play' }, (payload) => {
-		console.log('Play:', payload);
-		assert(soundboard.play(payload.sound));
-	})
-	.subscribe((state) => {
-		console.log('Channel[soundboard] state:', state);
-	});
-
 client.on('ready', async () => {
-	console.log(`Logged in as ${client.user!.tag}!`);
+	console.log(`[Event:Ready] Logged in as ${client.user!.tag}!`);
 	const guild = await client.guilds.fetch(GUILD_ID);
 	const members = await guild.members.fetch();
 
@@ -102,20 +48,175 @@ client.on('ready', async () => {
 				// Requires force fetch to get the accent color
 				// https://discord.js.org/docs/packages/discord.js/14.14.1/User:Class#accentColor
 				const user = await client.users.fetch(id, { force: true });
-				return transform(user);
+				return transformUser(user);
 			})
 	);
 
 	await supabase.from('members').upsert(data);
-	console.log('Updated DB!');
+	console.log('[Event:Ready] Updated DB!');
 
-	const connection = joinVoiceChannel({
-		channelId: '599177587884818443',
-		guildId: guild.id,
-		adapterCreator: guild.voiceAdapterCreator
-	});
+	soundboard = new Soundboard(GUILD_ID, client, supabase);
 
-	soundboard.subscribe(connection);
+	{
+		const res = await supabase.from('sounds').select('*');
+		if (res.error) throw res.error;
+		await Promise.allSettled(
+			z
+				.array(Sound)
+				.parse(res.data)
+				.map((x) => soundboard!.addSound(x))
+		);
+		console.log('[Event:Ready] Added sounds!');
+	}
+
+	{
+		const res = await supabase.from('intros').select('*');
+		if (res.error) throw res.error;
+		intros = new Map(
+			z
+				.array(Intro)
+				.parse(res.data)
+				.map((x) => [x.id, x.sound])
+		);
+		console.log('[Event:Ready] Added intros!');
+	}
+
+	loaded = true;
+
+	supabase
+		.channel('table-db-changes')
+		.on(
+			'postgres_changes',
+			{
+				event: 'INSERT',
+				schema: 'public',
+				table: 'sounds'
+			},
+			(payload) => {
+				console.log('[Channel:table-db-changes] Sound INSERT:', payload);
+				const data = z.object({ new: Sound }).parse(payload);
+				soundboard!.addSound(data.new);
+			}
+		)
+		.on(
+			'postgres_changes',
+			{
+				event: 'DELETE',
+				schema: 'public',
+				table: 'sounds'
+			},
+			(payload) => {
+				console.log('[Channel:table-db-changes] Sound DELETE:', payload);
+				const data = z.object({ old: z.object({ id: z.string().uuid() }) }).parse(payload);
+				soundboard!.removeSound(data.old.id);
+			}
+		)
+		.on(
+			'postgres_changes',
+			{
+				event: 'INSERT',
+				schema: 'public',
+				table: 'intros'
+			},
+			(payload) => {
+				console.log('[Channel:table-db-changes] Intro INSERT:', payload);
+				const data = z.object({ new: Intro }).parse(payload);
+				intros!.set(data.new.id, data.new.sound);
+			}
+		)
+		.on(
+			'postgres_changes',
+			{
+				event: 'UPDATE',
+				schema: 'public',
+				table: 'intros'
+			},
+			(payload) => {
+				console.log('[Channel:table-db-changes] Intro UPDATE:', payload);
+				const data = z.object({ new: Intro }).parse(payload);
+				intros!.set(data.new.id, data.new.sound);
+			}
+		)
+		.on(
+			'postgres_changes',
+			{
+				event: 'DELETE',
+				schema: 'public',
+				table: 'intros'
+			},
+			(payload) => {
+				console.log('[Channel:table-db-changes] Intro DELETE:', payload);
+				const data = z.object({ old: z.object({ id: z.string() }) }).parse(payload);
+				intros!.delete(data.old.id);
+			}
+		)
+		.subscribe((state) => {
+			console.log('[Channel:table-db-changes] State:', state);
+		});
+});
+
+client.on('userUpdate', async (_oldUser, newUser) => {
+	const guild = await client.guilds.fetch(GUILD_ID);
+	const members = await guild.members.fetch();
+	const member = members.get(newUser.id);
+	if (member === undefined) return;
+	if (newUser.bot) return;
+	const user = await client.users.fetch(newUser.id, { force: true });
+	await supabase.from('members').upsert(transformUser(user));
+	console.log('[Event:UserUpdate] Updated User!');
+});
+
+client.on('guildMemberAdd', async (member) => {
+	if (member.guild.id !== GUILD_ID) return;
+	if (member.user.bot) return;
+	const user = await client.users.fetch(member.user.id, { force: true });
+	await supabase.from('members').upsert(transformUser(user));
+	console.log('[Event:GuildMemberAdd] Updated User!');
+});
+
+client.on('voiceStateUpdate', async (oldState, newState) => {
+	if (!loaded) return;
+	assert(intros !== null);
+	assert(soundboard !== null);
+
+	const member = newState.member;
+	if (member === null || member.guild.id !== GUILD_ID || member.user.bot) return;
+	const user = member.user;
+
+	const wasInVC = oldState.channel !== null;
+	const nowInVC = newState.channel !== null;
+
+	const joinedVC = !wasInVC && nowInVC;
+	const leftVC = wasInVC && !nowInVC;
+	const changedVC = wasInVC && nowInVC && oldState.channel.id !== newState.channel.id;
+
+	if (joinedVC || changedVC) {
+		if (changedVC && oldState.channel.guild.id === GUILD_ID) {
+			lastDisconnect.set(`${user.id}-${oldState.channel.id}`, Date.now());
+		}
+		if (newState.channel.guild.id !== GUILD_ID) return;
+		const latestDisconnect = lastDisconnect.get(`${user.id}-${newState.channel.id}`);
+		if (latestDisconnect !== undefined && Date.now() - latestDisconnect < 5_000) {
+			console.log('[Event:VoiceStateUpdate] User reconnected, ignoring!');
+			return;
+		}
+		const intro = intros.get(user.id);
+		if (intro === undefined) return;
+		const res = await soundboard.play(intro, user.id);
+		if (!res) return;
+		console.log(`[Event:VoiceStateUpdate] Playing intro for User(${user.id}) "${user.username}"!`);
+	} else if (leftVC) {
+		if (oldState.channel.guild.id !== GUILD_ID) return;
+		lastDisconnect.set(`${user.id}-${oldState.channel.id}`, Date.now());
+		const connection = getVoiceConnection(GUILD_ID);
+		if (connection === undefined) return;
+		if (oldState.channel.id !== connection.joinConfig.channelId) return;
+		if (oldState.channel.members.filter((x) => !x.user.bot).size > 0) {
+			return;
+		}
+		connection.disconnect();
+		console.log(`[Event:VoiceStateUpdate] Left VC!`);
+	}
 });
 
 client.login(DISCORD_BOT_TOKEN);

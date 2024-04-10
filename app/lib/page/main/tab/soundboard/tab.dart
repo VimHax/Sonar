@@ -1,5 +1,6 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:app/main.dart';
+import 'package:app/models/members.dart';
 import 'package:app/models/sounds.dart';
 import 'package:app/page/main/tab/soundboard/sound.dart';
 import 'package:app/util/colors.dart';
@@ -45,8 +46,11 @@ class _SoundboardTabState extends State<SoundboardTab> {
             Expanded(
                 child: FadeIn(
                     delay: const Duration(milliseconds: 400),
-                    child: Consumer<SoundsModel>(
-                      builder: (context, sounds, child) => sounds.all == null
+                    child: Consumer2<MembersModel, SoundsModel>(
+                      builder: (context, members, sounds, child) => members
+                                      .all ==
+                                  null ||
+                              sounds.all == null
                           ? const Center(
                               child: SizedBox(
                                 width: 50,
@@ -78,6 +82,13 @@ class _SoundboardTabState extends State<SoundboardTab> {
                                     children: sounds.all!
                                         .map((e) => SoundButton(
                                               sound: e,
+                                              members: sounds.playing[e.id]
+                                                      ?.map((e) => members
+                                                          .getNullable(e))
+                                                      .where((e) => e != null)
+                                                      .map((e) => e as Member)
+                                                      .toList() ??
+                                                  [],
                                               onPressed: () {
                                                 sounds.play(e.id);
                                               },

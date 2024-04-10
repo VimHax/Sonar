@@ -1,6 +1,8 @@
 // ignore_for_file: non_constant_identifier_names
 
 import 'dart:async';
+import 'dart:io';
+import 'dart:math';
 
 import 'package:app/main.dart';
 import 'package:app/util/id.dart';
@@ -31,11 +33,20 @@ class Sound {
 
 class SoundsModel extends ChangeNotifier {
   List<Sound>? _sounds;
+  final Map<String, Map<String, int>> _playing = {};
   StreamSubscription? _sub;
   RealtimeChannel? _channel;
 
   UnmodifiableListView<Sound>? get all =>
       _sounds == null ? null : UnmodifiableListView(_sounds!);
+
+  UnmodifiableMapView<String, Set<String>> get playing =>
+      UnmodifiableMapView(_playing.map((soundID, members) => MapEntry(
+          soundID,
+          members.entries
+              .where((x) => x.value > 0)
+              .map((x) => x.key)
+              .toSet())));
 
   SoundsModel() {
     supabase.auth.onAuthStateChange.listen((data) {
@@ -52,6 +63,7 @@ class SoundsModel extends ChangeNotifier {
   }
 
   void play(String id) {
+    if (_channel == null) return;
     _channel!.sendBroadcastMessage(
         event: "play", payload: {'sound': id, 'member': getMemberID()});
   }
@@ -66,18 +78,49 @@ class SoundsModel extends ChangeNotifier {
         .channel("soundboard")
         .onBroadcast(
             event: 'playing',
-            callback: (payload) {
-              print('Play received: $payload');
+            callback: (msg) {
+              stdout.writeln('Playing received: $msg');
+              try {
+                String soundID = msg['payload']['sound'];
+                String memberID = msg['payload']['member'];
+                var members = _playing[soundID] ?? {};
+                members[memberID] = (members[memberID] ?? 0) + 1;
+                _playing[soundID] = members;
+                print(_playing);
+                notifyListeners();
+              } catch (e) {
+                // Ignore
+              }
             })
         .onBroadcast(
             event: 'error',
-            callback: (payload) {
-              print('Play received: $payload');
+            callback: (msg) {
+              stdout.writeln('Error received: $msg');
+              try {
+                String soundID = msg['payload']['sound'];
+                String memberID = msg['payload']['member'];
+                var members = _playing[soundID] ?? {};
+                members[memberID] = max((members[memberID] ?? 0) - 1, 0);
+                _playing[soundID] = members;
+                notifyListeners();
+              } catch (e) {
+                // Ignore
+              }
             })
         .onBroadcast(
             event: 'completed',
-            callback: (payload) {
-              print('Complete received: $payload');
+            callback: (msg) {
+              stdout.writeln('Completed received: $msg');
+              try {
+                String soundID = msg['payload']['sound'];
+                String memberID = msg['payload']['member'];
+                var members = _playing[soundID] ?? {};
+                members[memberID] = max((members[memberID] ?? 0) - 1, 0);
+                _playing[soundID] = members;
+                notifyListeners();
+              } catch (e) {
+                // Ignore
+              }
             })
         .subscribe();
   }

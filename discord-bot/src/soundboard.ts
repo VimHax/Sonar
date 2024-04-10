@@ -1,16 +1,31 @@
 import { PassThrough, pipeline, Readable } from 'node:stream';
 import axios, { HttpStatusCode } from 'axios';
 import prism from 'prism-media';
-import { SupabaseClient } from '@supabase/supabase-js';
+import { RealtimeChannel, SupabaseClient } from '@supabase/supabase-js';
 import { Sound } from './types';
-import { assert, humanFileSize } from './util';
+import { assert, humanFileSize, nonNull } from './util';
 import { performance } from 'perf_hooks';
 import {
+	AudioPlayer,
 	createAudioPlayer,
 	createAudioResource,
-	StreamType,
-	VoiceConnection
+	joinVoiceChannel,
+	NoSubscriberBehavior,
+	StreamType
 } from '@discordjs/voice';
+import { z } from 'zod';
+import { Client } from 'discord.js';
+
+interface DecodedSound {
+	id: string;
+	name: string;
+	buffer: Buffer;
+}
+
+interface PlayingSound extends DecodedSound {
+	member: string;
+	start: number | null;
+}
 
 const FFMPEG_PCM_ARGUMENTS = [
 	'-analyzeduration',
@@ -41,26 +56,49 @@ const CHUNK_DURATION = (CHUNK_SIZE / (SAMPLE_RATE * SAMPLE_SIZE)) * 1_000;
 const WRITE_AHEAD = 5;
 
 export default class Soundboard {
-	private readonly _sounds = new Map<string, { name: string; buffer: Buffer }>();
-	private readonly _stream = new PassThrough();
-	private readonly _player = createAudioPlayer();
+	private readonly _sounds = new Map<string, DecodedSound>();
+	private readonly _channel: RealtimeChannel;
+	private _stream: PassThrough | null = null;
+	private _player: AudioPlayer = createAudioPlayer({
+		behaviors: { noSubscriber: NoSubscriberBehavior.Play }
+	});
 	private _playerPaused = true;
-	private _playing: { name: string; start: number | null; buffer: Buffer }[] = [];
+	private _playing: PlayingSound[] = [];
 	private _start: number | null = null;
 	private _cursor: number = 0;
 	private _paused: number | null = null;
-	private _pausedTime: number = 0;
 
-	public constructor(private readonly _supabase: SupabaseClient) {
-		const resource = createAudioResource(this._stream, { inputType: StreamType.Raw });
-		this._player.play(resource);
-
+	public constructor(
+		private readonly _guildID: string,
+		private readonly _client: Client,
+		private readonly _supabase: SupabaseClient
+	) {
 		this._tick();
-		this._stream.on('drain', () => this._tick());
-	}
 
-	public subscribe(connection: VoiceConnection) {
-		connection.subscribe(this._player);
+		this._channel = _supabase.channel('soundboard');
+		this._channel
+			.on('broadcast', { event: 'play' }, async (payload) => {
+				console.log('[Channel:soundboard] Play:', payload);
+				const res = z.object({ member: z.string(), sound: z.string().uuid() }).safeParse(payload);
+				if (!res.success) return;
+				const willPlay = await this.play(res.data.sound, res.data.member);
+				if (willPlay) {
+					this._channel.send({
+						type: 'broadcast',
+						event: 'playing',
+						payload: { member: res.data.member, sound: res.data.sound }
+					});
+				} else {
+					this._channel.send({
+						type: 'broadcast',
+						event: 'error',
+						payload: { member: res.data.member, sound: res.data.sound }
+					});
+				}
+			})
+			.subscribe((state) => {
+				console.log('[Channel:soundboard] State:', state);
+			});
 	}
 
 	public async addSound(sound: Sound): Promise<void> {
@@ -71,17 +109,46 @@ export default class Soundboard {
 		assert(res.data instanceof Buffer);
 		const buffer = await Soundboard._decodeS16LE(Readable.from(res.data));
 		assert(buffer.byteLength > 0);
-		this._sounds.set(sound.id, { name: sound.name, buffer });
+		this._sounds.set(sound.id, { id: sound.id, name: sound.name, buffer });
 		console.log(
 			`[Soundboard] Added Sound(${sound.id}) "${sound.name}" of raw size ${humanFileSize(buffer.byteLength, true)}`
 		);
 	}
 
-	public play(id: string): boolean {
+	public removeSound(id: string): void {
+		const sound = this._sounds.get(id);
+		if (sound === undefined) return;
+		this._sounds.delete(id);
+		console.log(`[Soundboard] Removed Sound(${sound.id}) "${sound.name}"`);
+	}
+
+	public async play(id: string, memberID: string): Promise<boolean> {
 		const sound = this._sounds.get(id);
 		if (sound === undefined) return false;
-		this._playing.push({ name: sound.name, start: null, buffer: sound.buffer });
-		console.log(`[Soundboard] Playing sound "${sound.name}"...`);
+
+		const guild = await this._client.guilds.fetch(this._guildID);
+		const member = await guild.members.fetch(memberID);
+		const channel = member.voice.channel;
+		if (channel === null) return false;
+
+		let connection = joinVoiceChannel({
+			channelId: channel.id,
+			guildId: guild.id,
+			adapterCreator: guild.voiceAdapterCreator
+		});
+
+		connection.subscribe(this._player);
+
+		this._playing.push({
+			id: sound.id,
+			member: member.id,
+			name: sound.name,
+			start: null,
+			buffer: sound.buffer
+		});
+		console.log(
+			`[Soundboard] Playing Sound(${sound.id}) "${sound.name}" from Member(${member.id})...`
+		);
 		return true;
 	}
 
@@ -119,16 +186,24 @@ export default class Soundboard {
 				const chunks = Math.ceil(x.buffer.byteLength / CHUNK_SIZE);
 				const stillPlaying = this._cursor - x.start <= chunks;
 				if (!stillPlaying) {
-					console.log(`[Soundboard] Completed sound "${x.name}"...`);
+					console.log(
+						`[Soundboard] Completed Sound(${x.id}) "${x.name}" from Member(${x.member})!`
+					);
+					this._channel.send({
+						type: 'broadcast',
+						event: 'completed',
+						payload: { member: x.member, sound: x.id }
+					});
 				}
 				return stillPlaying;
 			});
 
 			if (this._playing.length === 0) {
 				if (!this._playerPaused) {
-					console.log('[Soundboard] Paused player!');
+					console.log('[Soundboard] Stop player!');
 					this._playerPaused = true;
-					this._player.pause();
+					this._player.stop();
+					this._stream = null;
 				}
 				this._cursor++;
 				continue;
@@ -136,7 +211,9 @@ export default class Soundboard {
 				if (this._playerPaused) {
 					this._playerPaused = false;
 					console.log('[Soundboard] Unpause player!');
-					this._player.unpause();
+					this._stream = new PassThrough();
+					this._stream.on('drain', () => this._tick());
+					this._player.play(createAudioResource(this._stream, { inputType: StreamType.Raw }));
 				}
 			}
 
@@ -153,7 +230,7 @@ export default class Soundboard {
 				}
 			}
 
-			const res = this._stream.write(chunk);
+			const res = nonNull(this._stream).write(chunk);
 			this._cursor++;
 			if (!res) {
 				console.log('[Soundboard] Stream paused!');

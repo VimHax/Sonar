@@ -1,10 +1,10 @@
 // ignore_for_file: non_constant_identifier_names
 
 import 'dart:async';
-import 'dart:collection';
 
 import 'package:app/main.dart';
 import 'package:app/util/id.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -54,6 +54,10 @@ class MembersModel extends ChangeNotifier {
 
   Member get(String id) {
     return _members!.firstWhere((e) => e.id == id);
+  }
+
+  Member? getNullable(String id) {
+    return _members!.firstWhereOrNull((e) => e.id == id);
   }
 
   void _startTracking() {

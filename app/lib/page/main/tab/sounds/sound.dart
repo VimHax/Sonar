@@ -71,7 +71,9 @@ class _SoundRowState extends State<SoundRow> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Row(
+            Expanded(
+                child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -109,8 +111,10 @@ class _SoundRowState extends State<SoundRow> {
                   ],
                 )
               ],
-            ),
-            Row(
+            )),
+            Expanded(
+                child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text("shortcut:",
                     style: GoogleFonts.montserrat(
@@ -136,8 +140,10 @@ class _SoundRowState extends State<SoundRow> {
                           : HotKeyView(hotKey: hotKeys.get(widget.sound.id)!),
                 )
               ],
-            ),
-            Row(
+            )),
+            Expanded(
+                child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text("creator:",
                     style: GoogleFonts.montserrat(
@@ -193,8 +199,10 @@ class _SoundRowState extends State<SoundRow> {
                           )),
                 )
               ],
-            ),
-            Row(
+            )),
+            Expanded(
+                child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 AspectRatio(
                   aspectRatio: 1,
@@ -227,7 +235,7 @@ class _SoundRowState extends State<SoundRow> {
                   ),
                 )
               ],
-            )
+            )),
           ],
         ),
       ),

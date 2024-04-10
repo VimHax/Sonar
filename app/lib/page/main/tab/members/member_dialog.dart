@@ -23,6 +23,7 @@ class MemberDialog extends StatefulWidget {
 
 class _MemberDialogState extends State<MemberDialog> {
   bool _loading = false;
+  bool _intros = false;
   String? _selected;
   late final IntrosModel _introProvider;
 
@@ -42,12 +43,14 @@ class _MemberDialogState extends State<MemberDialog> {
 
   void _onIntrosUpdate() {
     setState(() {
+      _intros = _introProvider.all != null;
+      if (!_intros) return;
       Intro? intro = _introProvider.get(widget.member.id);
-      setState(() => _selected = intro == null
+      _selected = intro == null
           ? null
           : Provider.of<SoundsModel>(context, listen: false)
               .get(intro.sound)!
-              .id);
+              .id;
     });
   }
 
@@ -148,98 +151,132 @@ class _MemberDialogState extends State<MemberDialog> {
                                     ),
                                     Consumer<SoundsModel>(
                                       builder: (context, sounds, child) =>
-                                          DropdownButtonHideUnderline(
-                                        child: DropdownButton2<String>(
-                                          items: [
-                                            const DropdownMenuItem<String>(
-                                              value: null,
-                                              child: Text(
-                                                "None",
-                                                style: TextStyle(
-                                                  fontSize: 14,
-                                                ),
-                                              ),
-                                            ),
-                                            ...sounds.all!
-                                                .map((Sound item) =>
-                                                    DropdownMenuItem<String>(
-                                                      value: item.id,
-                                                      child: Text(
-                                                        item.name,
-                                                        style: const TextStyle(
-                                                          fontSize: 14,
-                                                        ),
-                                                      ),
-                                                    ))
-                                                .toList()
-                                          ],
-                                          value: _selected,
-                                          onChanged: _loading
-                                              ? null
-                                              : (String? value) async {
-                                                  setState(() {
-                                                    _loading = true;
-                                                    _selected = value;
-                                                  });
-                                                  try {
-                                                    if (value == null) {
-                                                      await supabase
-                                                          .from("intros")
-                                                          .delete()
-                                                          .eq("id",
-                                                              widget.member.id);
-                                                    } else {
-                                                      await supabase
-                                                          .from("intros")
-                                                          .upsert({
-                                                        'id': widget.member.id,
-                                                        'sound': value
-                                                      });
-                                                    }
-                                                    setState(
-                                                        () => _loading = false);
-                                                  } catch (e) {
-                                                    setState(
-                                                        () => _loading = false);
-                                                    if (context.mounted) {
-                                                      showErrorSnackBar(context,
-                                                          "Error occurred when setting intro.");
-                                                    }
-                                                  }
-                                                },
-                                          buttonStyleData: ButtonStyleData(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 16),
-                                              height: 40,
-                                              width: 140,
-                                              decoration: BoxDecoration(
-                                                  color: BrandColors.whiteA,
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          borderRadius))),
-                                          menuItemStyleData:
-                                              const MenuItemStyleData(
-                                                  height: 40),
-                                          iconStyleData: _loading
-                                              ? const IconStyleData(
-                                                  icon: Center(
+                                          !_intros || sounds.all == null
+                                              ? const Padding(
+                                                  padding: EdgeInsets.only(
+                                                      right: 15),
                                                   child: SizedBox(
                                                     width: 20,
                                                     height: 20,
                                                     child:
                                                         CircularProgressIndicator(),
                                                   ),
-                                                ))
-                                              : const IconStyleData(),
-                                          dropdownStyleData: DropdownStyleData(
-                                              decoration: BoxDecoration(
-                                            color: BrandColors.grey,
-                                            borderRadius: BorderRadius.circular(
-                                                borderRadius),
-                                          )),
-                                        ),
-                                      ),
+                                                )
+                                              : DropdownButtonHideUnderline(
+                                                  child:
+                                                      DropdownButton2<String>(
+                                                    items: [
+                                                      const DropdownMenuItem<
+                                                          String>(
+                                                        value: null,
+                                                        child: Text(
+                                                          "None",
+                                                          style: TextStyle(
+                                                            fontSize: 14,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      ...sounds.all!.map(
+                                                          (Sound item) =>
+                                                              DropdownMenuItem<
+                                                                  String>(
+                                                                value: item.id,
+                                                                child: Text(
+                                                                  item.name,
+                                                                  style:
+                                                                      const TextStyle(
+                                                                    fontSize:
+                                                                        14,
+                                                                  ),
+                                                                ),
+                                                              ))
+                                                    ],
+                                                    value: _selected,
+                                                    onChanged: _loading
+                                                        ? null
+                                                        : (String?
+                                                            value) async {
+                                                            setState(() {
+                                                              _loading = true;
+                                                              _selected = value;
+                                                            });
+                                                            try {
+                                                              if (value ==
+                                                                  null) {
+                                                                await supabase
+                                                                    .from(
+                                                                        "intros")
+                                                                    .delete()
+                                                                    .eq(
+                                                                        "id",
+                                                                        widget
+                                                                            .member
+                                                                            .id);
+                                                              } else {
+                                                                await supabase
+                                                                    .from(
+                                                                        "intros")
+                                                                    .upsert({
+                                                                  'id': widget
+                                                                      .member
+                                                                      .id,
+                                                                  'sound': value
+                                                                });
+                                                              }
+                                                              setState(() =>
+                                                                  _loading =
+                                                                      false);
+                                                            } catch (e) {
+                                                              setState(() =>
+                                                                  _loading =
+                                                                      false);
+                                                              if (context
+                                                                  .mounted) {
+                                                                showErrorSnackBar(
+                                                                    context,
+                                                                    "Error occurred when setting intro.");
+                                                              }
+                                                            }
+                                                          },
+                                                    buttonStyleData: ButtonStyleData(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                                horizontal: 16),
+                                                        height: 40,
+                                                        width: 140,
+                                                        decoration: BoxDecoration(
+                                                            color: BrandColors
+                                                                .whiteA,
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        borderRadius))),
+                                                    menuItemStyleData:
+                                                        const MenuItemStyleData(
+                                                            height: 40),
+                                                    iconStyleData: _loading
+                                                        ? const IconStyleData(
+                                                            icon: Center(
+                                                            child: SizedBox(
+                                                              width: 20,
+                                                              height: 20,
+                                                              child:
+                                                                  CircularProgressIndicator(),
+                                                            ),
+                                                          ))
+                                                        : const IconStyleData(),
+                                                    dropdownStyleData:
+                                                        DropdownStyleData(
+                                                            decoration:
+                                                                BoxDecoration(
+                                                      color: BrandColors.grey,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              borderRadius),
+                                                    )),
+                                                  ),
+                                                ),
                                     ),
                                   ],
                                 )

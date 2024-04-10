@@ -53,6 +53,10 @@ void main() async {
   await windowManager.ensureInitialized();
   await hotKeyManager.unregisterAll();
 
+  if (Platform.isWindows) {
+    await registerSchemeWindows("sonar");
+  }
+
   await Supabase.initialize(
     url: supabaseURL,
     anonKey: supabaseAnonKey,

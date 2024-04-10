@@ -1,18 +1,19 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:animate_do/animate_do.dart';
 import 'package:app/main.dart';
 import 'package:app/models/sounds.dart';
+import 'package:app/page/main/tab/sounds/hotkey_view.dart';
 import 'package:app/util/edge_functions.dart';
 import 'package:app/util/colors.dart';
 import 'package:app/util/snackbar.dart';
 import 'package:app/util/storage.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:path/path.dart';
+import 'package:hotkey_manager/hotkey_manager.dart';
 
 class EditSoundDialog extends StatefulWidget {
   const EditSoundDialog({super.key, required this.sound});
@@ -26,15 +27,59 @@ class EditSoundDialog extends StatefulWidget {
 class _EditSoundDialogState extends State<EditSoundDialog> {
   late final TextEditingController _name;
   late final TextEditingController _shortcut;
+  HotKey? _hotKey;
   Uint8List? _thumbnail;
+  bool _recording = false;
   bool _loadingEdit = false;
   bool _loadingDelete = false;
 
   @override
   void initState() {
     _name = TextEditingController(text: widget.sound.name);
-    _shortcut = TextEditingController(text: "Ctrl + Shift + 1");
+    _shortcut = TextEditingController(text: "");
+    HardwareKeyboard.instance.addHandler(_handleKeyEvent);
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    HardwareKeyboard.instance.removeHandler(_handleKeyEvent);
+    super.dispose();
+  }
+
+  bool _handleKeyEvent(KeyEvent keyEvent) {
+    if (!_recording) return false;
+    if (keyEvent is KeyUpEvent) return false;
+
+    PhysicalKeyboardKey key = keyEvent.physicalKey;
+    if (key == PhysicalKeyboardKey.escape) {
+      setState(() {
+        _hotKey = null;
+        _recording = false;
+      });
+      return true;
+    }
+
+    final physicalKeysPressed = HardwareKeyboard.instance.physicalKeysPressed;
+    List<HotKeyModifier> modifiers = HotKeyModifier.values
+        .where((e) =>
+            e.physicalKeys.any(physicalKeysPressed.contains) &&
+            !e.physicalKeys.contains(key))
+        .toList();
+
+    _hotKey = HotKey(
+      key: key,
+      modifiers: modifiers,
+      scope: HotKeyScope.system,
+    );
+
+    if (!HotKeyModifier.values.any((e) => e.physicalKeys.contains(key))) {
+      setState(() => _recording = false);
+    } else {
+      setState(() {});
+    }
+
+    return true;
   }
 
   @override
@@ -132,6 +177,12 @@ class _EditSoundDialogState extends State<EditSoundDialog> {
                                 const SizedBox(
                                   height: 15,
                                 ),
+                                // HotKeyRecorder(
+                                //   onHotKeyRecorded: (hotKey) {
+                                //     // _hotKey = hotKey;
+                                //     print(hotKey);
+                                //   },
+                                // ),
                                 SizedBox(
                                   height: 48,
                                   child: Row(
@@ -139,30 +190,55 @@ class _EditSoundDialogState extends State<EditSoundDialog> {
                                         CrossAxisAlignment.stretch,
                                     children: [
                                       Expanded(
-                                        child: TextField(
-                                          enabled: false,
-                                          controller: _shortcut,
-                                          style: const TextStyle(
-                                              color: BrandColors.white),
-                                          decoration: const InputDecoration(
-                                              labelText: "Shortcut",
-                                              labelStyle: TextStyle(
+                                        child: Stack(
+                                          children: [
+                                            TextField(
+                                              enabled: false,
+                                              controller: _shortcut,
+                                              style: const TextStyle(
                                                   color: BrandColors.white),
-                                              disabledBorder:
-                                                  OutlineInputBorder(
-                                                borderRadius: BorderRadius.only(
-                                                    topLeft: Radius.circular(
-                                                        borderRadius),
-                                                    bottomLeft: Radius.circular(
-                                                        borderRadius)),
-                                                borderSide: BorderSide.none,
-                                              )),
+                                              decoration: InputDecoration(
+                                                  hintText: _recording ||
+                                                          _hotKey != null
+                                                      ? null
+                                                      : "Record Shortcut",
+                                                  labelStyle: const TextStyle(
+                                                      color: BrandColors.white),
+                                                  disabledBorder:
+                                                      const OutlineInputBorder(
+                                                    borderRadius: BorderRadius.only(
+                                                        topLeft:
+                                                            Radius.circular(
+                                                                borderRadius),
+                                                        bottomLeft:
+                                                            Radius.circular(
+                                                                borderRadius)),
+                                                    borderSide: BorderSide.none,
+                                                  )),
+                                            ),
+                                            _hotKey == null
+                                                ? Container()
+                                                : Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            11),
+                                                    child: HotKeyView(
+                                                        hotKey: _hotKey!),
+                                                  )
+                                          ],
                                         ),
                                       ),
                                       AspectRatio(
                                         aspectRatio: 1,
                                         child: TextButton(
-                                            onPressed: () async {},
+                                            onPressed: _recording
+                                                ? null
+                                                : () {
+                                                    setState(() {
+                                                      _hotKey = null;
+                                                      _recording = true;
+                                                    });
+                                                  },
                                             style: ButtonStyle(
                                               shape: MaterialStateProperty.all(
                                                   const RoundedRectangleBorder(

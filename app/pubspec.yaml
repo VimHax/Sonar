@@ -48,6 +48,7 @@ dependencies:
     audioplayers: ^6.0.0
     collection: ^1.18.0
     dropdown_button2: ^2.3.9
+    hotkey_manager: ^0.2.2
 
 dev_dependencies:
     flutter_test:

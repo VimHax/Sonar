@@ -13,6 +13,7 @@ import 'package:app/util/transition.dart';
 import 'package:flutter/material.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hotkey_manager/hotkey_manager.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:win32_registry/win32_registry.dart';
@@ -49,6 +50,7 @@ Future<void> registerSchemeWindows(String scheme) async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await windowManager.ensureInitialized();
+  await hotKeyManager.unregisterAll();
 
   await Supabase.initialize(
     url: supabaseURL,

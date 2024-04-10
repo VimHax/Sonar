@@ -4,11 +4,14 @@ import 'package:app/models/members.dart';
 import 'package:app/models/sounds.dart';
 import 'package:app/page/main/tab/members/member_dialog.dart';
 import 'package:app/page/main/tab/sounds/edit_sound_dialog.dart';
+import 'package:app/page/main/tab/sounds/hotkey_view.dart';
 import 'package:app/util/colors.dart';
 import 'package:app/util/storage.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hotkey_manager/hotkey_manager.dart';
 
 enum SoundState { none, loading, playing }
 
@@ -110,6 +113,24 @@ class _SoundRowState extends State<SoundRow> {
             ),
             Row(
               children: [
+                Text("shortcut:",
+                    style: GoogleFonts.montserrat(
+                      textStyle: const TextStyle(
+                          color: BrandColors.whiteA, fontSize: 16),
+                    )),
+                const SizedBox(
+                  width: 15,
+                ),
+                HotKeyView(
+                    hotKey: HotKey(
+                  key: PhysicalKeyboardKey.keyA,
+                  modifiers: [HotKeyModifier.control, HotKeyModifier.shift],
+                  scope: HotKeyScope.system,
+                ))
+              ],
+            ),
+            Row(
+              children: [
                 Text("creator:",
                     style: GoogleFonts.montserrat(
                       textStyle: const TextStyle(
@@ -149,17 +170,11 @@ class _SoundRowState extends State<SoundRow> {
                                   color: BrandColors.white, fontSize: 14),
                             ))
                       ],
-                    )),
-                const SizedBox(
-                  width: 15,
-                ),
-                Center(
-                  child: Container(
-                    height: 50,
-                    width: 1,
-                    color: BrandColors.whiteA,
-                  ),
-                ),
+                    ))
+              ],
+            ),
+            Row(
+              children: [
                 AspectRatio(
                   aspectRatio: 1,
                   child: Padding(

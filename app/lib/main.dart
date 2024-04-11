@@ -54,7 +54,7 @@ void main() async {
   await hotKeyManager.unregisterAll();
 
   if (Platform.isWindows) {
-    await registerSchemeWindows("sonar");
+    await registerSchemeWindows("com.vimhax.sonar");
   }
 
   await Supabase.initialize(

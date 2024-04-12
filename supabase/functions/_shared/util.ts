@@ -1,5 +1,6 @@
+import { z } from "zod";
+import createAdminClient from "./createAdminClient.ts";
 import createUserClient from "./createUserClient.ts";
-import { User, type SupabaseClient } from "supabase";
 
 export enum HTTPStatus {
     Ok = 200,
@@ -9,9 +10,9 @@ export enum HTTPStatus {
 
 export const UNAUTHORIZED_ERROR = new Error("Unauthorized.");
 
-export async function getMemberID(
-    req: Request
-): Promise<{ client: SupabaseClient; user: User; memberID: string }> {
+export const adminClient = createAdminClient();
+
+export async function getMemberID(req: Request): Promise<string> {
     const userClient = createUserClient(req);
     const {
         data: { user },
@@ -28,7 +29,19 @@ export async function getMemberID(
         throw new Error("Unable to retrieve user identity.");
     }
 
-    return { client: userClient, user, memberID: user.identities[0].id };
+    const res = await adminClient
+        .from("members")
+        .select("id,joined")
+        .eq("id", user.identities[0].id);
+    if (res.error) throw res.error;
+    if (res.data.length !== 1) throw UNAUTHORIZED_ERROR;
+
+    const member = z
+        .object({ id: z.string(), joined: z.boolean() })
+        .parse(res.data[0]);
+    if (!member.joined) throw UNAUTHORIZED_ERROR;
+
+    return member.id;
 }
 
 export function serve(handler: (req: Request) => Response | Promise<Response>) {

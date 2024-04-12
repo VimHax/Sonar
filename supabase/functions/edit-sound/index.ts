@@ -1,6 +1,5 @@
 import { z } from "zod";
-import { getMemberID, serve } from "../_shared/util.ts";
-import createAdminClient from "../_shared/createAdminClient.ts";
+import { adminClient, getMemberID, serve } from "../_shared/util.ts";
 import { createResponse } from "../_shared/util.ts";
 import { HTTPStatus } from "../_shared/util.ts";
 import { Sound } from "../_shared/types.ts";
@@ -10,8 +9,6 @@ const Form = z.object({
     name: z.string().min(1).max(100).optional(),
     thumbnail: z.instanceof(File).optional(),
 });
-
-const adminClient = createAdminClient();
 
 serve(async (req) => {
     const formData = await req.formData();

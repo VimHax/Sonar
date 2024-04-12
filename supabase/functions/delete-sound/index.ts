@@ -1,6 +1,5 @@
 import { z } from "zod";
-import { getMemberID, serve } from "../_shared/util.ts";
-import createAdminClient from "../_shared/createAdminClient.ts";
+import { adminClient, getMemberID, serve } from "../_shared/util.ts";
 import { createResponse } from "../_shared/util.ts";
 import { HTTPStatus } from "../_shared/util.ts";
 import { Sound } from "../_shared/types.ts";
@@ -8,8 +7,6 @@ import { Sound } from "../_shared/types.ts";
 const Body = z.object({
     id: z.string().uuid(),
 });
-
-const adminClient = createAdminClient();
 
 serve(async (req) => {
     const body = Body.parse(await req.json());

@@ -40,11 +40,20 @@ client.on('ready', async () => {
 	const guild = await client.guilds.fetch(GUILD_ID);
 	const members = await guild.members.fetch();
 
+	let joinedMembersInDB: Set<string>;
+	{
+		const res = await supabase.from('members').select('id,joined');
+		if (res.error) throw res.error;
+		const data = z.array(z.object({ id: z.string(), joined: z.boolean() })).parse(res.data);
+		joinedMembersInDB = new Set(data.filter((x) => x.joined).map((x) => x.id));
+	}
+
 	const data = await Promise.all(
 		members
 			.map((member) => member.user)
 			.filter((user) => !user.bot)
 			.map(async ({ id }) => {
+				joinedMembersInDB.delete(id);
 				// Requires force fetch to get the accent color
 				// https://discord.js.org/docs/packages/discord.js/14.14.1/User:Class#accentColor
 				const user = await client.users.fetch(id, { force: true });
@@ -53,6 +62,13 @@ client.on('ready', async () => {
 	);
 
 	await supabase.from('members').upsert(data);
+	if (joinedMembersInDB.size > 0) {
+		await supabase
+			.from('members')
+			.update({ joined: false })
+			.in('id', [...joinedMembersInDB.values()]);
+	}
+
 	console.log('[Event:Ready] Updated DB!');
 
 	soundboard = new Soundboard(GUILD_ID, client, supabase);
@@ -172,6 +188,14 @@ client.on('guildMemberAdd', async (member) => {
 	const user = await client.users.fetch(member.user.id, { force: true });
 	await supabase.from('members').upsert(transformUser(user));
 	console.log('[Event:GuildMemberAdd] Updated User!');
+});
+
+client.on('guildMemberRemove', async (member) => {
+	if (member.guild.id !== GUILD_ID) return;
+	if (member.user.bot) return;
+	const user = await client.users.fetch(member.user.id, { force: true });
+	await supabase.from('members').upsert(transformUser(user, false));
+	console.log('[Event:GuildMemberRemove] Updated User!');
 });
 
 client.on('voiceStateUpdate', async (oldState, newState) => {

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:animate_do/animate_do.dart';
 import 'package:app/main.dart';
 import 'package:app/models/hotkeys.dart';
+import 'package:app/models/members.dart';
 import 'package:app/models/sounds.dart';
 import 'package:app/page/main/tab/members/tab.dart';
 import 'package:app/page/main/tab/soundboard/tab.dart';
@@ -20,12 +21,17 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
+  late final MembersModel _membersProvider;
   late final HotKeysModel _hotKeysProvider;
   StreamSubscription? _sub;
   TabType _tab = TabType.soundboard;
 
   @override
   void initState() {
+    _membersProvider = context.read<MembersModel>();
+    _membersProvider.addListener(_onMembersUpdate);
+    _onMembersUpdate();
+
     _hotKeysProvider = context.read<HotKeysModel>();
     _hotKeysProvider.addListener(_onHotKeysUpdate);
     _onHotKeysUpdate();
@@ -40,11 +46,21 @@ class _MainPageState extends State<MainPage> {
 
   @override
   void dispose() {
+    _membersProvider.removeListener(_onMembersUpdate);
     _hotKeysProvider.removeListener(_onHotKeysUpdate);
     hotKeyManager.unregisterAll();
 
     _sub?.cancel();
     super.dispose();
+  }
+
+  void _onMembersUpdate() {
+    var members = _membersProvider.all;
+    if (members == null) return;
+    var me = _membersProvider.me;
+    if (me == null) {
+      Navigator.pushReplacementNamed(context, "/unauthorized");
+    }
   }
 
   void _onHotKeysUpdate() {

@@ -1,14 +1,15 @@
 import { User } from 'discord.js';
 import { Member } from './types';
 
-export function transformUser(user: User): Omit<Member, 'created_at'> {
+export function transformUser(user: User, joined: boolean = true): Omit<Member, 'created_at'> {
 	return {
 		id: user.id,
 		username: user.username,
 		global_name: user.globalName,
 		avatar: user.avatarURL() ?? user.defaultAvatarURL,
 		banner: user.bannerURL() ?? null,
-		accent_color: user.accentColor ?? null
+		accent_color: user.accentColor ?? null,
+		joined
 	};
 }
 

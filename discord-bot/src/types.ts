@@ -8,6 +8,7 @@ export const Member = z
 		avatar: z.string().url(),
 		banner: z.string().url().nullable(),
 		accent_color: z.number().int().nullable(),
+		joined: z.boolean(),
 		created_at: z.string().datetime({ offset: true })
 	})
 	.strict();

@@ -86,7 +86,6 @@ class SoundsModel extends ChangeNotifier {
                 var members = _playing[soundID] ?? {};
                 members[memberID] = (members[memberID] ?? 0) + 1;
                 _playing[soundID] = members;
-                print(_playing);
                 notifyListeners();
               } catch (e) {
                 // Ignore

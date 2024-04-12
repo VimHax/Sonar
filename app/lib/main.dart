@@ -7,6 +7,7 @@ import 'package:app/page/initial/page.dart';
 import 'package:app/page/login/page.dart';
 import 'package:app/models/members.dart';
 import 'package:app/page/main/page.dart';
+import 'package:app/page/unauthorized/page.dart';
 import 'package:app/util/background.dart';
 import 'package:app/util/colors.dart';
 import 'package:app/util/titlebar.dart';
@@ -146,7 +147,8 @@ class Sonar extends StatelessWidget {
       routes: {
         '/': (context) => const InitialPage(),
         '/login': (context) => const LoginPage(),
-        '/main': (context) => const MainPage()
+        '/main': (context) => const MainPage(),
+        '/unauthorized': (context) => const UnauthorizedPage()
       },
       // home: Background(),
     );

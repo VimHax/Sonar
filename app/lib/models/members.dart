@@ -39,7 +39,7 @@ class MembersModel extends ChangeNotifier {
 
   Member? get me {
     if (_members == null) return null;
-    return get(getMemberID());
+    return getNullable(getMemberID());
   }
 
   MembersModel() {

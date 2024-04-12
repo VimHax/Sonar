@@ -1,6 +1,5 @@
 import { z } from "zod";
-import { getMemberID, serve } from "../_shared/util.ts";
-import createAdminClient from "../_shared/createAdminClient.ts";
+import { adminClient, getMemberID, serve } from "../_shared/util.ts";
 import { createResponse } from "../_shared/util.ts";
 import { HTTPStatus } from "../_shared/util.ts";
 
@@ -11,8 +10,6 @@ const Form = z.object({
     thumbnail: z.instanceof(File),
     audio: z.instanceof(File),
 });
-
-const adminClient = createAdminClient();
 
 function generateCleanup(bucket: string, path: string): Cleanup {
     return async () => {
@@ -26,7 +23,7 @@ serve(async (req) => {
     formData.forEach((value, key) => (data[key] = value));
     const form = Form.parse(data);
 
-    const { memberID } = await getMemberID(req);
+    const memberID = await getMemberID(req);
 
     const thumbnailID = crypto.randomUUID();
     let thumbnailCleanup: Cleanup;

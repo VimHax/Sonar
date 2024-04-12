@@ -58,7 +58,7 @@ class _MainPageState extends State<MainPage> {
     var members = _membersProvider.all;
     if (members == null) return;
     var me = _membersProvider.me;
-    if (me == null) {
+    if (me == null || !me.joined) {
       Navigator.pushReplacementNamed(context, "/unauthorized");
     }
   }

@@ -18,7 +18,8 @@ class Member {
       required this.global_name,
       required this.avatar,
       required this.banner,
-      required this.accent_color});
+      required this.accent_color,
+      required this.joined});
 
   final String id;
   final String username;
@@ -26,6 +27,7 @@ class Member {
   final String avatar;
   final String? banner;
   final int? accent_color;
+  final bool joined;
 
   factory Member.fromJson(Map<String, dynamic> json) => _$MemberFromJson(json);
 }

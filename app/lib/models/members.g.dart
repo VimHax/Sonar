@@ -13,6 +13,7 @@ Member _$MemberFromJson(Map<String, dynamic> json) => Member(
       avatar: json['avatar'] as String,
       banner: json['banner'] as String?,
       accent_color: json['accent_color'] as int?,
+      joined: json['joined'] as bool,
     );
 
 Map<String, dynamic> _$MemberToJson(Member instance) => <String, dynamic>{
@@ -22,4 +23,5 @@ Map<String, dynamic> _$MemberToJson(Member instance) => <String, dynamic>{
       'avatar': instance.avatar,
       'banner': instance.banner,
       'accent_color': instance.accent_color,
+      'joined': instance.joined,
     };

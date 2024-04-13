@@ -83,8 +83,7 @@ class _LoginPageState extends State<LoginPage> {
                                   try {
                                     await supabase.auth.signInWithOAuth(
                                         OAuthProvider.discord,
-                                        redirectTo:
-                                            'https://sonar-xi.vercel.app/');
+                                        redirectTo: loginRedirectURL);
                                   } catch (e) {
                                     setState(() {
                                       _loading = false;

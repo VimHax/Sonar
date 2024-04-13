@@ -22,6 +22,7 @@ import 'package:win32_registry/win32_registry.dart';
 import 'package:window_manager/window_manager.dart';
 
 final supabase = Supabase.instance.client;
+const loginRedirectURL = String.fromEnvironment("LOGIN_REDIRECT_URL");
 const supabaseURL = String.fromEnvironment("SUPABASE_URL");
 const supabaseAnonKey = String.fromEnvironment("SUPABASE_ANON_KEY");
 const supabaseFunctionsURL = '$supabaseURL/functions/v1';

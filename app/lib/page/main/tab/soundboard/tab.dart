@@ -96,7 +96,7 @@ class _SoundboardTabState extends State<SoundboardTab> {
                                         .indexed
                                         .map((e) => FadeIn(
                                             delay: Duration(
-                                                milliseconds: 100 * e.$1),
+                                                milliseconds: 75 * e.$1),
                                             child: e.$2))
                                         .toList(),
                                   ),

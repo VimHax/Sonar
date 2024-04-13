@@ -100,7 +100,7 @@ class SoundsTab extends StatelessWidget {
                                         .indexed
                                         .map((e) => FadeIn(
                                             delay: Duration(
-                                                milliseconds: 100 * e.$1),
+                                                milliseconds: 150 * e.$1),
                                             child: e.$2))
                                         .toList(),
                                   ),

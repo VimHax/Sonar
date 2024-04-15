@@ -92,7 +92,6 @@ class Sonar extends StatelessWidget {
       title: 'Sonar',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-          // splashFactory: NoSplash.splashFactory,
           textButtonTheme: TextButtonThemeData(
             style: ButtonStyle(
                 overlayColor: MaterialStateProperty.all(BrandColors.whiteA),
@@ -154,7 +153,6 @@ class Sonar extends StatelessWidget {
         '/main': (context) => const MainPage(),
         '/unauthorized': (context) => const UnauthorizedPage()
       },
-      // home: Background(),
     );
   }
 }

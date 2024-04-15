@@ -70,14 +70,6 @@ class HotKeyView extends StatelessWidget {
         for (HotKeyModifier modifier in hotKey.modifiers ?? [])
           KeyView(
             physicalKey: modifier.physicalKeys.first,
-            // label: switch (modifier) {
-            //   HotKeyModifier.alt => "Alt",
-            //   HotKeyModifier.capsLock => "CapsLock",
-            //   HotKeyModifier.control => "Ctrl",
-            //   HotKeyModifier.fn => "Fn",
-            //   HotKeyModifier.meta => "Meta",
-            //   HotKeyModifier.shift => "Shift",
-            // },
           ),
         KeyView(
           physicalKey: hotKey.physicalKey,

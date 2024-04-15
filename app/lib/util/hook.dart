@@ -244,7 +244,6 @@ Future<UnregisterHook?> registerHook() async {
       first = false;
       bool registered = map['registered'];
       if (registered) {
-        // threadID = map['threadID'] as int;
         SendPort sendPort = map['sendPort'];
         keyboardHandler.setHooked(true);
         completer.complete(() => sendPort.send(null));

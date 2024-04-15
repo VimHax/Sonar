@@ -8,6 +8,7 @@ import 'package:app/models/sounds.dart';
 import 'package:app/page/main/tab/sounds/hotkey_view.dart';
 import 'package:app/util/edge_functions.dart';
 import 'package:app/util/colors.dart';
+import 'package:app/util/keyboard_handler.dart';
 import 'package:app/util/snackbar.dart';
 import 'package:app/util/storage.dart';
 import 'package:file_picker/file_picker.dart';
@@ -40,6 +41,7 @@ class _EditSoundDialogState extends State<EditSoundDialog> {
 
   @override
   void initState() {
+    keyboardHandler.unregisterAll();
     _hotKeysProvider = context.read<HotKeysModel>();
     _hotKeysProvider.addListener(_onHotKeysUpdate);
     _onHotKeysUpdate();
@@ -103,13 +105,18 @@ class _EditSoundDialogState extends State<EditSoundDialog> {
     return true;
   }
 
+  void _closeDialog() {
+    Provider.of<HotKeysModel>(context, listen: false).notify();
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
         GestureDetector(
           onTap: () {
-            if (!_loadingEdit && !_loadingDelete) Navigator.pop(context);
+            if (!_loadingEdit && !_loadingDelete) _closeDialog();
           },
         ),
         ClipRect(
@@ -330,7 +337,7 @@ class _EditSoundDialogState extends State<EditSoundDialog> {
                                                       showSuccessSnackBar(
                                                           context,
                                                           'Successfully edited sound.');
-                                                      Navigator.pop(context);
+                                                      _closeDialog();
                                                       return;
                                                     }
                                                     try {
@@ -352,8 +359,7 @@ class _EditSoundDialogState extends State<EditSoundDialog> {
                                                           showSuccessSnackBar(
                                                               context,
                                                               'Successfully edited sound.');
-                                                          Navigator.pop(
-                                                              context);
+                                                          _closeDialog();
                                                         } else {
                                                           showErrorSnackBar(
                                                               context,
@@ -426,8 +432,7 @@ class _EditSoundDialogState extends State<EditSoundDialog> {
                                                           showSuccessSnackBar(
                                                               context,
                                                               'Successfully deleted sound.');
-                                                          Navigator.pop(
-                                                              context);
+                                                          _closeDialog();
                                                         } else {
                                                           showErrorSnackBar(
                                                               context,

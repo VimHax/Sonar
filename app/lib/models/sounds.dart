@@ -87,9 +87,7 @@ class SoundsModel extends ChangeNotifier {
                 members[memberID] = (members[memberID] ?? 0) + 1;
                 _playing[soundID] = members;
                 notifyListeners();
-              } catch (e) {
-                // Ignore
-              }
+              } catch (_) {}
             })
         .onBroadcast(
             event: 'error',
@@ -102,9 +100,7 @@ class SoundsModel extends ChangeNotifier {
                 members[memberID] = max((members[memberID] ?? 0) - 1, 0);
                 _playing[soundID] = members;
                 notifyListeners();
-              } catch (e) {
-                // Ignore
-              }
+              } catch (_) {}
             })
         .onBroadcast(
             event: 'completed',
@@ -117,9 +113,7 @@ class SoundsModel extends ChangeNotifier {
                 members[memberID] = max((members[memberID] ?? 0) - 1, 0);
                 _playing[soundID] = members;
                 notifyListeners();
-              } catch (e) {
-                // Ignore
-              }
+              } catch (_) {}
             })
         .subscribe();
   }

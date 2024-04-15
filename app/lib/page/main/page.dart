@@ -9,8 +9,8 @@ import 'package:app/page/main/tab/members/tab.dart';
 import 'package:app/page/main/tab/soundboard/tab.dart';
 import 'package:app/page/main/tab/sounds/tab.dart';
 import 'package:app/page/main/tabs.dart';
+import 'package:app/util/keyboard_handler.dart';
 import 'package:flutter/material.dart';
-import 'package:hotkey_manager/hotkey_manager.dart';
 import 'package:provider/provider.dart';
 
 class MainPage extends StatefulWidget {
@@ -48,7 +48,7 @@ class _MainPageState extends State<MainPage> {
   void dispose() {
     _membersProvider.removeListener(_onMembersUpdate);
     _hotKeysProvider.removeListener(_onHotKeysUpdate);
-    hotKeyManager.unregisterAll();
+    keyboardHandler.unregisterAll();
 
     _sub?.cancel();
     super.dispose();
@@ -66,9 +66,9 @@ class _MainPageState extends State<MainPage> {
   void _onHotKeysUpdate() {
     var hotKeys = _hotKeysProvider.all;
     if (hotKeys == null) return;
-    hotKeyManager.unregisterAll();
+    keyboardHandler.unregisterAll();
     hotKeys.forEach((key, value) {
-      hotKeyManager.register(value, keyDownHandler: (hotKey) {
+      keyboardHandler.register(value, (hotKey) {
         Provider.of<SoundsModel>(context, listen: false).play(key);
       });
     });

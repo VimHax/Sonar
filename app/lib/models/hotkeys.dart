@@ -35,6 +35,10 @@ class HotKeysModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void notify() {
+    notifyListeners();
+  }
+
   HotKey? get(String id) {
     return _hotKeys![id];
   }

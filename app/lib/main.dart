@@ -10,6 +10,7 @@ import 'package:app/page/main/page.dart';
 import 'package:app/page/unauthorized/page.dart';
 import 'package:app/util/background.dart';
 import 'package:app/util/colors.dart';
+import 'package:app/util/hook.dart';
 import 'package:app/util/titlebar.dart';
 import 'package:app/util/transition.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +22,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:win32_registry/win32_registry.dart';
 import 'package:window_manager/window_manager.dart';
 
+UnregisterHook? unregisterHook;
 final supabase = Supabase.instance.client;
 const loginRedirectURL = String.fromEnvironment("LOGIN_REDIRECT_URL");
 const supabaseURL = String.fromEnvironment("SUPABASE_URL");
@@ -57,6 +59,7 @@ void main() async {
 
   if (Platform.isWindows) {
     await registerSchemeWindows("com.vimhax.sonar");
+    unregisterHook = await registerHook();
   }
 
   await Supabase.initialize(

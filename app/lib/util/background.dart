@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:app/main.dart';
 import 'package:app/util/colors.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
@@ -22,6 +24,13 @@ class _BackgroundState extends State<Background> with WindowListener {
   void dispose() {
     windowManager.removeListener(this);
     super.dispose();
+  }
+
+  @override
+  void onWindowClose() {
+    if (Platform.isWindows && unregisterHook != null) {
+      unregisterHook!();
+    }
   }
 
   @override

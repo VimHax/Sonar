@@ -306,7 +306,7 @@ packages:
     source: hosted
     version: "1.3.1"
   ffi:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: ffi
       sha256: "493f37e7df1804778ff3a53bd691d8692ddf69702cf4c1c1096a2e41b4779e21"
@@ -1006,7 +1006,7 @@ packages:
     source: hosted
     version: "1.3.2"
   uni_platform:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: uni_platform
       sha256: e02213a7ee5352212412ca026afd41d269eb00d982faa552f419ffc2debfad84
@@ -1150,7 +1150,7 @@ packages:
     source: hosted
     version: "2.4.4"
   win32:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: win32
       sha256: "0a989dc7ca2bb51eac91e8fd00851297cfffd641aa7538b165c62637ca0eaa4a"

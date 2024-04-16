@@ -544,6 +544,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.3.1"
+  keyboard_event:
+    dependency: "direct main"
+    description:
+      name: keyboard_event
+      sha256: "8549ac054a7620c4a7d11a1256c5a15df5a8f8b20a6f4106a1c98ed2afb213b8"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.4"
   leak_tracker:
     dependency: transitive
     description:
@@ -576,6 +584,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.0"
+  logger:
+    dependency: transitive
+    description:
+      name: logger
+      sha256: "7ad7215c15420a102ec687bb320a7312afd449bac63bfb1c60d9787c27b9767f"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.4.0"
   logging:
     dependency: transitive
     description:

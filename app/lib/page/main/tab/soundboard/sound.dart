@@ -49,6 +49,8 @@ class SoundButton extends StatelessWidget {
                   ]),
             ),
             child: Text(sound.name,
+                softWrap: false,
+                overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.montserrat(
                   textStyle: const TextStyle(
                       color: BrandColors.white,
@@ -58,7 +60,7 @@ class SoundButton extends StatelessWidget {
                 )),
           ),
           Container(
-            alignment: Alignment.bottomRight,
+            alignment: Alignment.topRight,
             padding: const EdgeInsets.all(16),
             child: Wrap(
               direction: Axis.horizontal,

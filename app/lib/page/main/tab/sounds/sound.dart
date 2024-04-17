@@ -96,11 +96,14 @@ class _SoundRowState extends State<SoundRow> {
                 const SizedBox(
                   width: 15,
                 ),
-                Column(
+                Flexible(
+                    child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(widget.sound.name,
+                        overflow: TextOverflow.ellipsis,
+                        softWrap: false,
                         style: GoogleFonts.montserrat(
                           textStyle: const TextStyle(
                               color: BrandColors.white,
@@ -109,7 +112,7 @@ class _SoundRowState extends State<SoundRow> {
                               height: 0.9),
                         ))
                   ],
-                )
+                ))
               ],
             )),
             Expanded(
@@ -154,49 +157,48 @@ class _SoundRowState extends State<SoundRow> {
                   width: 15,
                 ),
                 Consumer<MembersModel>(
-                  builder: (context, members, child) => members.all == null
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(),
-                        )
-                      : TextButton(
-                          style: ButtonStyle(
-                              shape: MaterialStateProperty.all(
-                                  RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(36),
-                              )),
-                              padding: MaterialStateProperty.all(
-                                  const EdgeInsets.fromLTRB(4, 11, 15, 11))),
-                          onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) => MemberDialog(
-                                  member: members.get(widget.sound.author)),
-                            );
-                          },
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              CircleAvatar(
-                                radius: 15,
-                                backgroundImage: NetworkImage(
-                                    members.get(widget.sound.author).avatar),
-                              ),
-                              const SizedBox(
-                                width: 10,
-                              ),
-                              Text(
-                                  members
-                                          .get(widget.sound.author)
-                                          .global_name ??
-                                      members.get(widget.sound.author).username,
-                                  style: GoogleFonts.montserrat(
-                                    textStyle: const TextStyle(
-                                        color: BrandColors.white, fontSize: 14),
-                                  ))
-                            ],
-                          )),
+                  builder: (context, members, child) {
+                    if (members.all == null) {
+                      return const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                    var member = members.get(widget.sound.author);
+                    return TextButton(
+                        style: ButtonStyle(
+                            shape: MaterialStateProperty.all(
+                                RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(36),
+                            )),
+                            padding: MaterialStateProperty.all(
+                                const EdgeInsets.fromLTRB(4, 11, 15, 11))),
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) =>
+                                MemberDialog(id: widget.sound.author),
+                          );
+                        },
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            CircleAvatar(
+                              radius: 15,
+                              backgroundImage: NetworkImage(member.avatar),
+                            ),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            Text(member.global_name ?? member.username,
+                                style: GoogleFonts.montserrat(
+                                  textStyle: const TextStyle(
+                                      color: BrandColors.white, fontSize: 14),
+                                ))
+                          ],
+                        ));
+                  },
                 )
               ],
             )),

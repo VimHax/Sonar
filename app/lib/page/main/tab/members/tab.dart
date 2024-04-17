@@ -68,8 +68,8 @@ class MembersTab extends StatelessWidget {
                                     rowSizes: List.filled(
                                         (members.all!.length / 2.0).ceil(),
                                         auto),
-                                    columnGap: 10,
-                                    rowGap: 10,
+                                    columnGap: borderWidth,
+                                    rowGap: borderWidth,
                                     children: members.all!
                                         .map((e) => MemberRow(member: e))
                                         .indexed

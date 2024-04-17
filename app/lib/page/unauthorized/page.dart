@@ -49,7 +49,7 @@ class _UnauthorizedPageState extends State<UnauthorizedPage> {
         child: Container(
           decoration: const BoxDecoration(
               color: BrandColors.grey,
-              borderRadius: BorderRadius.all(Radius.circular(10))),
+              borderRadius: BorderRadius.all(Radius.circular(borderRadius))),
           child: Stack(
             children: [
               Center(

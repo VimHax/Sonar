@@ -77,8 +77,8 @@ class _SoundboardTabState extends State<SoundboardTab> {
                                     rowSizes: List.filled(
                                         (sounds.all!.length / 1.0).ceil(),
                                         auto),
-                                    columnGap: 10,
-                                    rowGap: 10,
+                                    columnGap: borderWidth,
+                                    rowGap: borderWidth,
                                     children: sounds.all!
                                         .map((e) => SoundButton(
                                               sound: e,

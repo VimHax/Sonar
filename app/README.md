@@ -2,7 +2,7 @@
 
 ![Screenshot of Sonar](../assets/app.png)
 
-The desktop application for Sonar built using Flutter.
+The desktop application for Sonar built using [Flutter](https://flutter.dev/). Thanks to [Supabase Realtime](https://supabase.com/docs/guides/realtime) everything that can be seen throughout the app is live, meaning any edits done will show up in realtime without having to refresh the page for example. (This goes for the members as well, if a user updates their avatar in Discord the change will show up in realtime on the desktop app.)
 
 ## Gallery
 

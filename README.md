@@ -6,17 +6,17 @@ Upload sound effects to your heart's content and play them at will at the press 
 
 ## Features
 
-- Upload sounds with names and thumbnail images (which can be GIFs) which can then later be edited or deleted.
+- Upload sounds with names and thumbnail images (which can be GIFs) which can then later be edited or deleted.\
 ![Add sound prompt](assets/add_sound.png)
-- Set global keyboard shortcuts to sounds so that you can trigger them while playing a game, for example. On Windows these keyboard shortcuts are non-blocking, meaning that, for example, you can assign a shortcut which would otherwise conflict with a shortcut in the game.\
+- Set global keyboard shortcuts to sounds so that you can trigger them while playing a game, for example. On Windows these keyboard shortcuts are non-blocking meaning that you can assign a shortcut which would otherwise conflict with a shortcut in the game.\
   ![Shortcut assigned to a sound](assets/shortcut.png)
   > My friends had the idea to assign a sound effect to the letter `Q` so that when we trigger our ultimate abilities in [Overwatch](https://overwatch.blizzard.com/) it would play a funny sound effect.
 - Assign sounds as intro sounds for members. When a member joins any voice channel Sonar would join and play their assigned intro sound.\
   ![Intro assigned to a member](assets/intro.png)
 - Sounds can overlap, so you can play any sound at any time and know that it will be played together with any other ongoing sound.
-- You can see who is playing what sound effect so you know who interrupted you, for example.\
+- You can see who is playing what sound effect so you know who interrupted you.\
   ![A user playing a sound](assets/playing.png)
-- Users login with their Discord account allowing for a smooth onboarding experience. This allows Sonar to only allow access to users who are members of a configured Discord Server so that only your friends can annoy you, for example. 
+- Users login with their Discord account allowing for a smooth onboarding experience. This allows Sonar to only allow access to users who are members of a configured Discord Server so that only your friends can annoy you. 
 
 ## Platforms (Desktop Application)
 
@@ -29,10 +29,10 @@ Upload sound effects to your heart's content and play them at will at the press 
 
 ## Components
 
-- [Desktop Application - `/app`](app/README.md)
-- [Discord Bot - `/discord-bot`](discord-bot/README.md)
-- [Redirect Website - `/redirect`](redirect/README.md)
-- [Supabase - `/supabase`](supabase/README.md)
+- [Desktop Application - `/app`](app/)
+- [Discord Bot - `/discord-bot`](discord-bot/)
+- [Redirect Website - `/redirect`](redirect/)
+- [Supabase - `/supabase`](supabase/)
 
 ## Installation
 
@@ -52,7 +52,7 @@ There may be platform specific dependencies which you may have to install to bui
 
 - [`audioplayers`](https://github.com/bluefireteam/audioplayers/blob/main/getting_started.md#setup-platforms)
 - [`hotkey_manager`](https://pub.dev/packages/hotkey_manager#installation)
-- [`@discordjs/voice` (Discord Bot, Optional)](https://discordjs.guide/voice/#installation)\
+- [`@discordjs/voice` (For the Discord Bot, Optional)](https://discordjs.guide/voice/#installation)\
   The recommended dependencies ([`@discordjs/opus`](https://www.npmjs.com/package/@discordjs/opus) and [`sodium`](https://www.npmjs.com/package/sodium)) have been installed however you may swap these out for any other supported package.
 
 ### Discord Application
@@ -67,7 +67,7 @@ A Discord Application is necessary for user authentication through OAuth2 and pl
 For Supabase to be able to handle user authentication through Discord OAuth2 (which is required for Sonar) you need to add the appropriate redirect URI. You can learn more about OAuth2 with Discord for Supabase [here](https://supabase.com/docs/guides/auth/social-login/auth-discord).
 
 > #### Deploying locally?
-> ![Redirect for local deployment](assets/redirects.png)
+> ![Redirect for local deployment](assets/redirects.png)\
 > For a local deployment `http://127.0.0.1:54321/auth/v1/callback` may be a suitable URI.
 
 #### Bot (Gateway Intents)
@@ -184,7 +184,7 @@ You should now be able to login through your Discord account and use all the fun
 
 > #### Not using Windows?
 > On Windows the application registers a custom scheme at startup however this currently isn't the case for the other platforms, therefore you may have trouble logging in with the browser. For Linux [this](https://unix.stackexchange.com/questions/497146/create-a-custom-url-protocol-handler) post may be helpful to setup the scheme. (For Sonar the scheme is `com.vimhax.sonar`, eg: `com.vimhax.sonar://login-callback`) The desktop entry below (added to `~/.local/share/applications`) got me through development on Linux.
-> ```toml
+> ```
 > #!/usr/bin/env xdg-open
 > 
 > [Desktop Entry]

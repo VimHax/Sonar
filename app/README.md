@@ -1,16 +1,42 @@
-# app
+# Desktop Application
 
-A new Flutter project.
+![Screenshot of Sonar](../assets/app.png)
 
-## Getting Started
+The desktop application for Sonar built using Flutter.
 
-This project is a starting point for a Flutter application.
+## Gallery
 
-A few resources to get you started if this is your first Flutter project:
+### Initial Page
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+The first page you see when you open Sonar.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+![Initial Page](../assets/app_initial.png)
+
+### Login Page
+
+Takes you through the Discord OAuth2 system in the browser to login to Sonar.
+
+![Login Page](../assets/app_login.png)
+
+### Soundboard Page
+
+Users can click on a sound tile to play it through the bot. Users can also see whoever else is playing sounds at that time with an indicator inside the tile of the sound being played.
+
+![Soundboard Page](../assets/app.png)
+
+### Sounds Page
+
+Add, preview, edit or remove sounds.
+
+> To remove a keyboard shortcut open the `Edit Sound` prompt, press record and press `ESC` on your keyboard.
+
+![Sounds Page](../assets/app_sounds.png)
+![Add Sound](../assets/app_sounds_add.png)
+![Edit Sound](../assets/app_sounds_edit.png)
+
+### Members Page
+
+See all non-bot members on the Discord Server and add or remove intro sounds from them.
+
+![Members Page](../assets/app_members.png)
+![Member Intro](../assets/app_members_intro.png)

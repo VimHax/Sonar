@@ -10,7 +10,7 @@ At startup the bot will look through all the current members of the server and u
 
 ### Sound Playback
 
-When started the bot will fetch all the sounds from the database and proceed to download all the audio files, decode them and keep them in memory. The bot will be notified about any newly added or removed sounds through [Postgres Changes](https://supabase.com/docs/guides/realtime/postgres-changes) and will process the sound as previously mentioned or remove the sound from memory respectively. Likewise the bot will keep track of the intros assigned to members.
+When started the bot will fetch all the sounds from the database and proceed to download all the audio files, decode them and keep them in memory. The bot will be notified about any newly added or removed sounds through [Postgres Changes](https://supabase.com/docs/guides/realtime/postgres-changes) and will process the sound as previously mentioned or remove the sound from memory respectively.
 
 When a user clicks on a sound in the Sonar application or triggers a shortcut the request is sent to the bot using the [Realtime Broadcast](https://supabase.com/docs/guides/realtime/broadcast) feature. When the request is received the bot then finds the decoded sound data from memory, mixes it together with any other playing sounds and then stream this data to Discord so that the bot can play it.
 
